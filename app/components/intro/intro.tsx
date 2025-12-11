@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { getAssetAsBlob } from "node:sea";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { useDispatch } from "react-redux";
+import { nextSection } from "@/store/pageControl";
 
 export default function Intro() {
 
@@ -9,8 +13,11 @@ export default function Intro() {
     const line1Ref = React.useRef<HTMLDivElement>(null);
     const line2Ref = React.useRef<HTMLDivElement>(null);
     const ballRef = React.useRef<HTMLDivElement>(null);
+    const outerContainerRef = React.useRef<HTMLDivElement>(null);
     const ballX = useRef(0);
     const listenersReady = useRef(false);
+    const pageCurrentSection = useSelector((state: RootState) => state.currentPage.currentSection);
+    const dispatch = useDispatch();
 
     //Animate characters based on ball position
     useEffect(() => {
@@ -68,18 +75,21 @@ export default function Intro() {
         return () => gsap.ticker.remove(updateChars);
     }, []);
 
+
     //Move the ball on scroll
     useEffect(() => {
         const ball = ballRef.current;
         if (!ball) return;
 
         const handleWheel = (e: WheelEvent) => {
+            if (pageCurrentSection != 0) return;
             ballX.current += e.deltaY * 0.35;
             if (ballX.current < -window.innerWidth / 2) {
                 ballX.current = -window.innerWidth / 2;
             }
             if (ballX.current > window.innerWidth / 2) {
-                ballX.current = window.innerWidth / 2;
+                ballX.current = window.innerWidth / 2
+                dispatch(nextSection());
             }
             gsap.to(ball, {
                 x: ballX.current,
@@ -125,7 +135,7 @@ export default function Intro() {
     const text2 = [{ char: "I" }, { char: "t" }, { char: " " }, { char: "t" }, { char: "e" }, { char: "l" }, { char: "l" }, { char: "s" }, { char: " " }, { char: "y" }, { char: "o" }, { char: "u" }, { char: " " }, { char: "a" }, { char: "b" }, { char: "o" }, { char: "u" }, { char: "t" }];
 
     return (
-        <div className="relative w-screen h-screen flex flex-col items-center overflow-hidden">
+        <div className="relative w-screen h-screen flex flex-col items-center shrink-0" ref={outerContainerRef}>
             <div
                 ref={containerRef}
                 className="relative text-[calc(100vw*1.05/10)] leading-tight text-center"
