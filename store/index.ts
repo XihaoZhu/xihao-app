@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import pageCcontrol from './pageControl';
+import ballControlSlice from './ballControl';
 
 export const store = configureStore({
     reducer: {
         currentPage: pageCcontrol,
+        ballInfo: ballControlSlice,
     },
 });
 

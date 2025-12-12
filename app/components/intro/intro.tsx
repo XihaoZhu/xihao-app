@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { getAssetAsBlob } from "node:sea";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { useDispatch } from "react-redux";
-import { nextSection } from "@/store/pageControl";
+import { move } from "@/store/ballControl";
 
 export default function Intro() {
 
@@ -12,22 +14,37 @@ export default function Intro() {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const line1Ref = React.useRef<HTMLDivElement>(null);
     const line2Ref = React.useRef<HTMLDivElement>(null);
-    const ballRef = React.useRef<HTMLDivElement>(null);
     const outerContainerRef = React.useRef<HTMLDivElement>(null);
-    const ballX = useRef(0);
-    const listenersReady = useRef(false);
-    const pageCurrentSection = useSelector((state: RootState) => state.currentPage.currentSection);
+
+    const x = useSelector((state: RootState) => state.ballInfo.x);
+    const y = useSelector((state: RootState) => state.ballInfo.y);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        const id = requestAnimationFrame(() => {
+            if (!line1Ref.current || !line2Ref.current) return;
+
+            const r1 = line1Ref.current.getBoundingClientRect();
+            const r2 = line2Ref.current.getBoundingClientRect();
+
+            const mid = (r1.bottom + r2.top) / 2;
+
+            dispatch(move({
+                x,
+                y: mid
+            }));
+            console.log(mid)
+        });
+        return () => cancelAnimationFrame(id);
+    }, []);
 
     //Animate characters based on ball position
     useEffect(() => {
         const updateChars = () => {
-            if (!ballRef.current || !line1Ref.current || !line2Ref.current) return;
+            if (!line1Ref.current || !line2Ref.current) return;
 
-            const ballRect = ballRef.current.getBoundingClientRect();
             const ballCenter = {
-                x: ballRect.left + ballRect.width / 2,
-                y: ballRect.top + ballRect.height / 2,
+                x, y
             };
 
             const chars = [
@@ -73,51 +90,8 @@ export default function Intro() {
         gsap.ticker.add(updateChars);
 
         return () => gsap.ticker.remove(updateChars);
-    }, []);
+    }, [x, y]);
 
-
-    //Move the ball on scroll
-    useEffect(() => {
-        const ball = ballRef.current;
-        if (!ball) return;
-
-        const handleWheel = (e: WheelEvent) => {
-            if (pageCurrentSection != 0) return;
-            ballX.current += e.deltaY * 0.35;
-            if (ballX.current < -window.innerWidth / 2) {
-                ballX.current = -window.innerWidth / 2;
-            }
-            if (ballX.current > window.innerWidth / 2) {
-                ballX.current = window.innerWidth / 2
-                dispatch(nextSection());
-            }
-            gsap.to(ball, {
-                x: ballX.current,
-                duration: 0.5,
-                ease: "power3.Out",
-                onUpdate: () => {
-                    updateBallCenter();
-                },
-            });
-        };
-
-        const updateBallCenter = () => {
-            const rect = ball.getBoundingClientRect();
-            const center = {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-            };
-        };
-
-        if (!listenersReady.current) {
-            window.addEventListener("wheel", handleWheel, { passive: true });
-            listenersReady.current = true;
-        }
-
-        return () => {
-            window.removeEventListener("wheel", handleWheel);
-        };
-    }, []);
 
     const renderText = (list: Array<{ char: string; color?: string; stroke?: boolean }>) =>
         list.map((item, i) => (
@@ -144,18 +118,7 @@ export default function Intro() {
                     <div ref={line1Ref}>
                         {renderText(text1)}
                     </div>
-
-                    <div
-                        ref={ballRef}
-                        className="
-                          absolute left-1/2 top-1/2
-                          -translate-x-1/2 -translate-y-1/2
-                          w-[5vw] h-[5vw]
-                          rounded-full pointer-events-none
-                          shadow-[0_0_40px_10px_rgba(255,255,255,0.45),0_0_60px_25px_rgba(200,204,208,0.35),inset_0_0_18px_8px_rgba(255,255,255,0.35),inset_0_0_30px_16px_rgba(40,40,40,0.55)]
-                         "
-                    ></div>
-
+                    {/* 这个位置 */}
                     <div ref={line2Ref}>
                         {renderText(text2)}
                     </div>
