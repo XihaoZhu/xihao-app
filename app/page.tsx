@@ -14,14 +14,24 @@ import { move } from "@/store/ballControl";
 export default function Home() {
 
   const pageCurrentSection = useSelector((state: RootState) => state.currentPage.currentSection);
-  const x = useSelector((state: RootState) => state.ballInfo.x);
-  const y = useSelector((state: RootState) => state.ballInfo.y);
+  const { x, y } = useSelector((state: RootState) => state.ballInfo);
+  const ballLocationRef = useRef({ x, y });
+  useEffect(() => { ballLocationRef.current = { x, y }; }, [x, y]);
+
   const biggestContainerRef = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
-  const ballX = useRef(0);
-  const ballY = useRef(0);
+  const movementX = useRef(0);
+  const movementY = useRef(0);
+
   const dispatch = useDispatch();
-  const listenersReady = useRef(false);
+
+  const originalWindowWidth = useRef(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
+  const originalWindowHeight = useRef(
+    typeof window !== "undefined" ? window.innerHeight : 0
+  );
+
 
   // when move to about section the viewport moves
   useEffect(() => {
@@ -40,36 +50,55 @@ export default function Home() {
     if (hasRunRef.current) return;
     if (!ballRef.current) return;
 
-    ballRef.current.style.top = y + 'px';
-    ballRef.current.style.left = x + 'px';
+    gsap.set(ballRef.current, {
+      x: ballLocationRef.current.x * window.innerWidth,
+      y: ballLocationRef.current.y * window.innerHeight,
+    });
 
-    if (y != 0) hasRunRef.current = true;
+    if (ballLocationRef.current.y != 0) hasRunRef.current = true;
   }, [y]);
 
-  //Move the ball on scroll
+  // Handle window resize
   useEffect(() => {
+    const handleResize = () => {
+      if (!ballRef.current) return;
+
+      gsap.set(ballRef.current, {
+        x: ballLocationRef.current.x * window.innerWidth,
+        y: ballLocationRef.current.y * window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  //Move the ball on scroll in intro page only
+  const listenersReady = useRef(false);
+  useEffect(() => {
+    if (!ballRef.current) return;
+    if (pageCurrentSection != 0) return;
+
     const ball = ballRef.current;
-    if (!ball) return;
 
     const handleWheel = (e: WheelEvent) => {
-      if (pageCurrentSection != 0) return;
-      ballX.current += e.deltaY * 0.35;
-      if (ballX.current < -window.innerWidth / 2) {
-        ballX.current = -window.innerWidth / 2;
+      movementX.current = e.deltaY * 0.35;
+      let newX = ballLocationRef.current.x + movementX.current / window.innerWidth;
+      if (newX < 0) {
+        newX = 0;
       }
-      if (ballX.current > window.innerWidth / 2) {
-        ballX.current = window.innerWidth / 2
+      if (newX > 1) {
+        newX = 1;
         window.removeEventListener("wheel", handleWheel);
         dispatch(nextSection());
       }
-      dispatch(move({ x: x + ballX.current }));
+      dispatch(move({ x: newX }));
       gsap.to(ball, {
-        x: ballX.current,
+        x: newX * window.innerWidth,
         duration: 0.5,
         ease: "power3.Out",
       });
     };
-
 
     if (!listenersReady.current) {
       window.addEventListener("wheel", handleWheel, { passive: true });

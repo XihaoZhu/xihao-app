@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { useDispatch } from "react-redux";
 import { move } from "@/store/ballControl";
+import { useLayoutEffect } from "react";
 
 export default function Intro() {
 
@@ -20,31 +21,22 @@ export default function Intro() {
     const y = useSelector((state: RootState) => state.ballInfo.y);
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        const id = requestAnimationFrame(() => {
-            if (!line1Ref.current || !line2Ref.current) return;
-
-            const r1 = line1Ref.current.getBoundingClientRect();
-            const r2 = line2Ref.current.getBoundingClientRect();
-
-            const mid = (r1.bottom + r2.top) / 2;
-
-            dispatch(move({
-                x,
-                y: mid
-            }));
-            console.log(mid)
-        });
-        return () => cancelAnimationFrame(id);
+    // Initiate ball position in the middle of two lines    
+    useLayoutEffect(() => {
+        if (!containerRef.current) return;
+        const containerSize = containerRef.current.getBoundingClientRect()
+        const mid = (containerSize.top + containerSize.bottom) / 2;
+        dispatch(move({ x, y: mid / window.innerHeight }));
     }, []);
 
     //Animate characters based on ball position
     useEffect(() => {
+
         const updateChars = () => {
             if (!line1Ref.current || !line2Ref.current) return;
 
             const ballCenter = {
-                x, y
+                x: x * window.innerWidth, y: y * window.innerHeight
             };
 
             const chars = [
@@ -112,13 +104,13 @@ export default function Intro() {
         <div className="relative w-screen h-screen flex flex-col items-center shrink-0" ref={outerContainerRef}>
             <div
                 ref={containerRef}
-                className="relative text-[calc(100vw*1.05/10)] leading-tight text-center"
+                className="relative text-[10vw] leading-tight text-center"
             >
                 <div className="relative inline-block">
                     <div ref={line1Ref}>
                         {renderText(text1)}
                     </div>
-                    {/* 这个位置 */}
+
                     <div ref={line2Ref}>
                         {renderText(text2)}
                     </div>
@@ -127,7 +119,7 @@ export default function Intro() {
             <div
                 className="
                   absolute bottom-[-12vw] left-[-5vw]
-                  text-[calc(100vw*1.05/4)]
+                  text-[26vw]
                   whitespace-nowrap
                   tracking-[-0.15em]
                   font-inter
