@@ -32,7 +32,6 @@ export default function Home() {
     typeof window !== "undefined" ? window.innerHeight : 0
   );
 
-
   // when move to about section the viewport moves
   useEffect(() => {
     if (pageCurrentSection == 1) {
@@ -49,10 +48,10 @@ export default function Home() {
   useEffect(() => {
     if (hasRunRef.current) return;
     if (!ballRef.current) return;
-
     gsap.set(ballRef.current, {
-      x: ballLocationRef.current.x * window.innerWidth,
-      y: ballLocationRef.current.y * window.innerHeight,
+      transformOrigin: "50% 50%",
+      x: ballLocationRef.current.x * window.innerWidth - 2.5 * window.innerWidth / 100,
+      y: ballLocationRef.current.y * window.innerHeight - 2.5 * window.innerWidth / 100,
     });
 
     if (ballLocationRef.current.y != 0) hasRunRef.current = true;
@@ -64,8 +63,8 @@ export default function Home() {
       if (!ballRef.current) return;
 
       gsap.set(ballRef.current, {
-        x: ballLocationRef.current.x * window.innerWidth,
-        y: ballLocationRef.current.y * window.innerHeight,
+        x: ballLocationRef.current.x * window.innerWidth - 2.5 * window.innerWidth / 100,
+        y: ballLocationRef.current.y * window.innerHeight - 2.5 * window.innerWidth / 100,
       });
     };
 
@@ -94,7 +93,7 @@ export default function Home() {
       }
       dispatch(move({ x: newX }));
       gsap.to(ball, {
-        x: newX * window.innerWidth,
+        x: newX * window.innerWidth - 2.5 * window.innerWidth / 100,
         duration: 0.5,
         ease: "power3.Out",
       });
@@ -113,14 +112,14 @@ export default function Home() {
   return (
     <div className="bg-black h-screen flex overflow-hidden w-screen relative" >
       <div
-        className="flex h-auto w-auto"
+        className="flex h-auto w-auto p-0 relative"
         ref={biggestContainerRef}
       >
         <div
           ref={ballRef}
           className="
                           absolute
-                          -translate-x-1/2 -translate-y-1/2
+                          inline-block
                           w-[5vw] h-[5vw]
                           rounded-full pointer-events-none
                           shadow-[0_0_40px_10px_rgba(255,255,255,0.45),0_0_60px_25px_rgba(200,204,208,0.35),inset_0_0_18px_8px_rgba(255,255,255,0.35),inset_0_0_30px_16px_rgba(40,40,40,0.55)]
