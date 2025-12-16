@@ -101,7 +101,7 @@ export default function Intro() {
     const text2 = [{ char: "I" }, { char: "t" }, { char: " " }, { char: "t" }, { char: "e" }, { char: "l" }, { char: "l" }, { char: "s" }, { char: " " }, { char: "y" }, { char: "o" }, { char: "u" }, { char: " " }, { char: "a" }, { char: "b" }, { char: "o" }, { char: "u" }, { char: "t" }];
 
     return (
-        <div className="relative w-screen h-screen flex flex-col items-center shrink-0 mt-0" ref={outerContainerRef}>
+        <div className="relative w-screen h-screen flex flex-col items-center shrink-0 mt-0 overflow-hidden" ref={outerContainerRef}>
             <div
                 ref={containerRef}
                 className="relative text-[10vw] leading-tight text-center"
@@ -123,7 +123,7 @@ export default function Intro() {
                   whitespace-nowrap
                   tracking-[-0.15em]
                   font-inter
-                  text-white/95
+                  text-white
                   drop-shadow-[0_0_8px_rgba(255,255,255,1)]
                 "
             >

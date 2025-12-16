@@ -25,13 +25,6 @@ export default function Home() {
 
   const dispatch = useDispatch();
 
-  const originalWindowWidth = useRef(
-    typeof window !== "undefined" ? window.innerWidth : 0
-  );
-  const originalWindowHeight = useRef(
-    typeof window !== "undefined" ? window.innerHeight : 0
-  );
-
   // when move to about section the viewport moves
   useEffect(() => {
     if (pageCurrentSection == 1) {
@@ -41,6 +34,41 @@ export default function Home() {
         ease: "power2.inOut",
       })
     }
+  }, [pageCurrentSection]);
+
+
+  // when move to about section the ball moves
+  useEffect(() => {
+    if (pageCurrentSection == 1) {
+      gsap.to(ballRef.current, {
+        x: ballLocationRef.current.x * window.innerWidth,
+        duration: 1,
+        ease: "power2.inOut",
+      })
+      gsap.to(ballRef.current, {
+        y: 55 / 100 * window.innerHeight,
+        duration: 2,
+        ease: "bounce.out",
+      })
+      dispatch(move({ y: 0.55, x: ballLocationRef.current.x + 0.025 }));
+    }
+  }, [pageCurrentSection]);
+
+
+  // handle resizing of window for the viewport movement
+  useEffect(() => {
+    const handleResize = () => {
+      if (!biggestContainerRef.current) return;
+
+      if (pageCurrentSection == 1) {
+        gsap.to(biggestContainerRef.current, {
+          x: -window.innerWidth,
+        });
+      };
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [pageCurrentSection]);
 
   //Set initial ball position
@@ -57,7 +85,7 @@ export default function Home() {
     if (ballLocationRef.current.y != 0) hasRunRef.current = true;
   }, [y]);
 
-  // Handle window resize
+  // Handle window resize for the ball
   useEffect(() => {
     const handleResize = () => {
       if (!ballRef.current) return;
