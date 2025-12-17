@@ -21,10 +21,12 @@ export default function Home() {
   const windowHeightRef = useRef(0);
   const windowWidthRef = useRef(0);
 
+  const hasMovedtoAbout = useRef(false)
+
   const biggestContainerRef = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
   const movementX = useRef(0);
-  const movementY = useRef(0);
+
   useEffect(() => {
     if (!window) return;
     windowHeightRef.current = window.innerHeight;
@@ -38,7 +40,7 @@ export default function Home() {
     gsap.to(ballRef.current, {
       transformOrigin: "50% 50%",
       x: ballLocationRef.current.x * windowWidthRef.current - 2.5 * windowWidthRef.current / 100,
-      y: ballLocationRef.current.y * windowHeightRef.current - 2.5 * windowWidthRef.current / 100,
+      y: ballLocationRef.current.y * windowHeightRef.current - (pageCurrentSection == 1 ? 5 : 2.5) * windowWidthRef.current / 100,
       duration: duration || 1,
       ease: ease || "power3.Out",
     });
@@ -58,18 +60,27 @@ export default function Home() {
 
   // when move to about section the ball moves
   useEffect(() => {
-    if (pageCurrentSection == 1) {
-      gsap.to(ballRef.current, {
-        x: ballLocationRef.current.x * windowWidthRef.current,
-        duration: 1,
-        ease: "power2.inOut",
-      })
-      gsap.to(ballRef.current, {
-        y: 0.55 * windowHeightRef.current,
+    if (pageCurrentSection === 1) {
+      const tl = gsap.timeline()
+      tl.to(ballRef.current, { x: ballLocationRef.current.x * windowWidthRef.current, duration: 3, ease: 'power2.out' })
+      tl.to(ballRef.current, {
+        y: 0.65 * windowHeightRef.current - 0.05 * windowWidthRef.current,
         duration: 2,
-        ease: "bounce.out",
-      })
-      dispatch(move({ y: 0.55, x: ballLocationRef.current.x + 0.025 }));
+        ease: "bounce.out"
+      }, '<')
+      tl.to(ballRef.current, {
+        y: 0.5 * windowHeightRef.current - 0.05 * windowWidthRef.current,
+        duration: 1,
+        ease: "power2.out", onComplete: () => {
+          hasMovedtoAbout.current = true
+          dispatch(
+            move({
+              y: 0.5,
+              x: ballLocationRef.current.x + 0.025,
+            })
+          );
+        },
+      }, '>')
     }
   }, [pageCurrentSection]);
 
@@ -96,13 +107,13 @@ export default function Home() {
   }, [pageCurrentSection, windowHeightRef, windowWidthRef]);
 
   //Set initial ball position
-  const hasRunRef = useRef(false);
+  const hasInitiate = useRef(false);
   useEffect(() => {
-    if (hasRunRef.current) return;
+    if (hasInitiate.current) return;
     if (!ballRef.current) return;
     handleBallMove();
 
-    if (ballLocationRef.current.y != 0) hasRunRef.current = true;
+    if (ballLocationRef.current.y != 0) hasInitiate.current = true;
   }, [y]);
 
   //Move the ball on scroll in intro page only
@@ -141,6 +152,13 @@ export default function Home() {
       window.removeEventListener("wheel", handleWheel);
     };
   }, []);
+
+  // ballMove in about page
+  useEffect(() => {
+    if (pageCurrentSection !== 1) return;
+    if (!hasMovedtoAbout.current) return
+    handleBallMove();
+  }, [x, y, pageCurrentSection, hasMovedtoAbout.current]);
 
   return (
     <div className="bg-black h-screen flex overflow-hidden w-screen relative" >
