@@ -18,18 +18,37 @@ export default function Home() {
   const ballLocationRef = useRef({ x, y });
   useEffect(() => { ballLocationRef.current = { x, y }; }, [x, y]);
 
+  const windowHeightRef = useRef(0);
+  const windowWidthRef = useRef(0);
+
   const biggestContainerRef = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
   const movementX = useRef(0);
   const movementY = useRef(0);
+  useEffect(() => {
+    if (!window) return;
+    windowHeightRef.current = window.innerHeight;
+    windowWidthRef.current = window.innerWidth;
+  }, []);
 
   const dispatch = useDispatch();
+
+  // update ball position function
+  const handleBallMove = (duration?: number, ease?: string) => {
+    gsap.to(ballRef.current, {
+      transformOrigin: "50% 50%",
+      x: ballLocationRef.current.x * windowWidthRef.current - 2.5 * windowWidthRef.current / 100,
+      y: ballLocationRef.current.y * windowHeightRef.current - 2.5 * windowWidthRef.current / 100,
+      duration: duration || 1,
+      ease: ease || "power3.Out",
+    });
+  }
 
   // when move to about section the viewport moves
   useEffect(() => {
     if (pageCurrentSection == 1) {
       gsap.to(biggestContainerRef.current, {
-        x: -window.innerWidth,
+        x: -windowWidthRef.current,
         duration: 2,
         ease: "power2.inOut",
       })
@@ -41,12 +60,12 @@ export default function Home() {
   useEffect(() => {
     if (pageCurrentSection == 1) {
       gsap.to(ballRef.current, {
-        x: ballLocationRef.current.x * window.innerWidth,
+        x: ballLocationRef.current.x * windowWidthRef.current,
         duration: 1,
         ease: "power2.inOut",
       })
       gsap.to(ballRef.current, {
-        y: 55 / 100 * window.innerHeight,
+        y: 0.55 * windowHeightRef.current,
         duration: 2,
         ease: "bounce.out",
       })
@@ -54,51 +73,37 @@ export default function Home() {
     }
   }, [pageCurrentSection]);
 
-
-  // handle resizing of window for the viewport movement
+  // handle resizing of window
   useEffect(() => {
     const handleResize = () => {
+      windowHeightRef.current = window.innerHeight;
+      windowWidthRef.current = window.innerWidth;
+
       if (!biggestContainerRef.current) return;
+      if (!ballRef.current) return;
 
       if (pageCurrentSection == 1) {
         gsap.to(biggestContainerRef.current, {
-          x: -window.innerWidth,
+          x: -windowWidthRef.current,
         });
       };
+
+      handleBallMove();
     }
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [pageCurrentSection]);
+  }, [pageCurrentSection, windowHeightRef, windowWidthRef]);
 
   //Set initial ball position
   const hasRunRef = useRef(false);
   useEffect(() => {
     if (hasRunRef.current) return;
     if (!ballRef.current) return;
-    gsap.set(ballRef.current, {
-      transformOrigin: "50% 50%",
-      x: ballLocationRef.current.x * window.innerWidth - 2.5 * window.innerWidth / 100,
-      y: ballLocationRef.current.y * window.innerHeight - 2.5 * window.innerWidth / 100,
-    });
+    handleBallMove();
 
     if (ballLocationRef.current.y != 0) hasRunRef.current = true;
   }, [y]);
-
-  // Handle window resize for the ball
-  useEffect(() => {
-    const handleResize = () => {
-      if (!ballRef.current) return;
-
-      gsap.set(ballRef.current, {
-        x: ballLocationRef.current.x * window.innerWidth - 2.5 * window.innerWidth / 100,
-        y: ballLocationRef.current.y * window.innerHeight - 2.5 * window.innerWidth / 100,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   //Move the ball on scroll in intro page only
   const listenersReady = useRef(false);
@@ -110,7 +115,7 @@ export default function Home() {
 
     const handleWheel = (e: WheelEvent) => {
       movementX.current = e.deltaY * 0.35;
-      let newX = ballLocationRef.current.x + movementX.current / window.innerWidth;
+      let newX = ballLocationRef.current.x + movementX.current / windowWidthRef.current;
       if (newX < 0) {
         newX = 0;
       }
@@ -121,7 +126,7 @@ export default function Home() {
       }
       dispatch(move({ x: newX }));
       gsap.to(ball, {
-        x: newX * window.innerWidth - 2.5 * window.innerWidth / 100,
+        x: newX * windowWidthRef.current - 2.5 * windowWidthRef.current / 100,
         duration: 0.5,
         ease: "power3.Out",
       });

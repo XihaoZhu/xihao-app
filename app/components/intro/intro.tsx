@@ -19,15 +19,22 @@ export default function Intro() {
 
     const x = useSelector((state: RootState) => state.ballInfo.x);
     const y = useSelector((state: RootState) => state.ballInfo.y);
+    const pageCurrentSection = useSelector((state: RootState) => state.currentPage.currentSection);
     const dispatch = useDispatch();
 
-    // Initiate ball position in the middle of two lines    
+    // Initiate ball position in the middle of two lines and handle window resize when page still in intro section  
     useLayoutEffect(() => {
         if (!containerRef.current) return;
-        const containerSize = containerRef.current.getBoundingClientRect()
-        const mid = (containerSize.top + containerSize.bottom) / 2;
-        dispatch(move({ x, y: mid / window.innerHeight }));
-    }, []);
+        const handleResize = () => {
+            if (pageCurrentSection !== 0) return;
+            const containerSize = containerRef.current!.getBoundingClientRect()
+            const mid = (containerSize.top + containerSize.bottom) / 2;
+            dispatch(move({ x, y: mid / window.innerHeight }));
+        }
+        window.addEventListener("resize", handleResize);
+        handleResize();
+        return () => window.removeEventListener("resize", handleResize);
+    }, [pageCurrentSection]);
 
     //Animate characters based on ball position
     useEffect(() => {
