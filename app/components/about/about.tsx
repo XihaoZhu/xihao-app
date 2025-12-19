@@ -84,7 +84,7 @@ export default function About() {
 
             const x = deltaXRef.current;
             const slope = Math.tan(angleDeg * Math.PI / 180);
-            const aspectRatio = window.innerHeight / window.innerWidth;
+            const aspectRatio = window.innerWidth / window.innerHeight;
             const y = 0.5 + (x - 0.5) * slope * aspectRatio;
 
             dispatch(move({ x: x + 1, y }));
@@ -100,8 +100,8 @@ export default function About() {
 
     return (
         <div className="relative w-screen h-screen flex flex-col items-center shrink-0 overflow-hidden">
-            <div className="w-[100vw] h-[50vh]"></div>
-            <div className="w-[100vw] h-[50vh] bg-white/95 drop-shadow-[0_0_8px_rgba(255,255,255,1)]" ref={whitePart}></div>
+            <div className="w-[100vw] h-[50vh] shrink-0"></div>
+            <div className="w-[100vw] h-[50vw] bg-white/95 drop-shadow-[0_0_8px_rgba(255,255,255,1)] shrink-0" ref={whitePart}></div>
         </div>
     );
 }

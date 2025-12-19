@@ -27,6 +27,7 @@ export default function Home() {
   const ballRef = useRef<HTMLDivElement>(null);
   const movementX = useRef(0);
 
+  // initialize windowHeightRef and windowWidthRef
   useEffect(() => {
     if (!window) return;
     windowHeightRef.current = window.innerHeight;
@@ -157,7 +158,7 @@ export default function Home() {
   useEffect(() => {
     if (pageCurrentSection !== 1) return;
     if (!hasMovedtoAbout.current) return
-    handleBallMove();
+    handleBallMove(0.1);
   }, [x, y, pageCurrentSection, hasMovedtoAbout.current]);
 
   return (
