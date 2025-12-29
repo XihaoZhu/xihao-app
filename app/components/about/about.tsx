@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { move } from "@/store/ballControl";
+import { Flip } from "gsap/all";
+
+gsap.registerPlugin(Flip)
 
 export default function About() {
 
@@ -97,7 +100,7 @@ export default function About() {
 
             const angleDeg = currentAngleRef.current;
 
-            deltaXRef.current += angleDeg * 0.0002;
+            deltaXRef.current += angleDeg * 0.0004;
             deltaXRef.current = Math.max(0.025, Math.min(0.975, deltaXRef.current));
 
             const x = deltaXRef.current;
@@ -150,7 +153,7 @@ export default function About() {
         gsap.to(blueLineRef.current, {
             scaleX: progress,
             scaleY: 0.5 + progress * 0.5,
-            x: Math.sin(currentAngleRef.current * Math.PI / 180) * window.innerHeight * 1 / 5,
+            x: Math.sin(currentAngleRef.current * Math.PI / 180) * window.innerHeight * 1 / 10,
             transformOrigin: 'right center',
             duration: 0.1,
             ease: 'power2.out',
@@ -184,6 +187,7 @@ export default function About() {
         });
     }, [x, arrivedTheEnd]);
     // text change
+    const textRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
     const texts: string[] = [
         "I graduated from the University of Nottingham with a Bachelor’s degree in Aerospace Engineering.",
         "I graduated from the University of Manchester with a Master’s degree in Aerospace Engineering.",
@@ -192,30 +196,67 @@ export default function About() {
         "I also taught A-level physics in an extracurricular class for 6 months as a part time job.",
         "I became the supervisor at the restaurant.",
         "I saved some money and quit to focus on coding.",
-        "I began self-learning coding at the end of 2023, and although the time and effort I could dedicate varied across different periods, I have never stopped moving forward in this direction."
+        "I began self-learning coding back to the end of 2023, and although the time and effort I could dedicate varied across different periods, I have never stopped moving forward in this direction."
     ];
     const intervals: number[][] = [
-        [0.075, 0.175],
-        [0.325, 0.425],
-        [0.425, 0.5],
+        [0.075, 0.2],
+        [0.225, 0.425],
+        [0.4, 0.5],
         [0.5, 0.85],
         [0.5, 0.7],
         [0.75, 0.85],
         [0.85, 0.95],
         [1, 1]
     ]
-    function getTextsByX(x: number) {
-        const result: string[] = [];
-
-        for (let i = 0; i < intervals.length; i++) {
-            const [min, max] = intervals[i];
-            if (x - 1 >= min && x - 1 < max) {
-                result.push(texts[i]);
+    const [prevTexts, setPrevTexts] = useState(new Set<number>)
+    useEffect(() => {
+        const showTexts = new Set<number>
+        const elements = Array.from(
+            document.querySelector('.text-lists')?.children ?? []
+        ) as HTMLElement[];
+        if (!arrivedTheEnd) {
+            intervals.forEach((el, idx) => {
+                if (x - 1 > el[0] && x - 1 < el[1]) {
+                    if (!showTexts.has(idx)) {
+                        showTexts.add(idx)
+                    }
+                }
+            })
+        } else {
+            if (x - 1 < 0.9 && x - 1 > 0.2) {
+                showTexts.add(texts.length - 1)
             }
         }
+        const newAddTexts = new Set<number>();
+        const newDeleteTexts = new Set<number>();
+        for (const item of showTexts) {
+            if (!prevTexts.has(item)) newAddTexts.add(item);
+        }
+        for (const item of prevTexts) {
+            if (!showTexts.has(item)) newDeleteTexts.add(item);
+        }
 
-        return result;
-    }
+        const state = Flip.getState(elements);
+
+        for (const el of newAddTexts) {
+            const node = elements[el];
+            node.style.display = 'block';
+            gsap.fromTo(node,
+                { opacity: 0, x: 20, scaleY: 0 },
+                { opacity: 1, x: 0, duration: 0.5, ease: 'power2.out', scaleY: 1 }
+            );
+        }
+        for (const el of newDeleteTexts) {
+            const node = elements[el];
+            gsap.fromTo(node,
+                { opacity: 1, x: 0, scaleY: 1 },
+                { opacity: 0, x: -20, scaleY: 0, duration: 0.5, ease: 'power2.out', onComplete: () => { node.style.display = 'none' } }
+            );
+        }
+
+        setPrevTexts(showTexts);
+
+    }, [x, arrivedTheEnd])
 
     return (
         <div className="relative w-screen h-screen flex flex-col items-center shrink-0 overflow-hidden pointer-events-none">
@@ -224,7 +265,7 @@ export default function About() {
                 <div className="w-[100vw] h-[50vh] flex items-center justify-center">
                     <div
                         className="
-                          max-w-[75vw] text-[2vw]
+                          w-[75vw] text-[2vw] relative
                           font-inter font-medium
                           text-[#eaeaea]
                           justify-center
@@ -233,11 +274,19 @@ export default function About() {
                           flex-col
                           tracking-[-0.015em]
                           drop-shadow-[0.15vw_0_0_rgba(180,220,255,0.75)]
+                          text-lists
                         "
                     >
-                        {getTextsByX(x).map((text, idx) => (
-                            <div key={idx}>{text}</div>
-                        ))}
+                        {texts.map((text, idx) => {
+                            return (
+                                <div
+                                    key={idx}
+                                    className="hidden"
+                                >
+                                    {text}
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </div>
