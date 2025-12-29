@@ -72,7 +72,8 @@ export default function Home() {
       tl.to(ballRef.current, {
         y: 0.5 * windowHeightRef.current - 0.05 * windowWidthRef.current,
         duration: 1,
-        ease: "power2.out", onComplete: () => {
+        ease: "power2.out",
+        onComplete: () => {
           hasMovedtoAbout.current = true
           dispatch(
             move({

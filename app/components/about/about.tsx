@@ -27,18 +27,6 @@ export default function About() {
     const yearLineRef = useRef<HTMLDivElement>(null);
     const [arrivedTheEnd, setArrivedTheEnd] = useState<boolean>(false)
 
-    const texts: string[] = [
-        "I graduated from the University of Nottingham with a Bachelor’s degree in Aerospace Engineering.",
-        "I graduated from the University of Manchester with a Master’s degree in Aerospace Engineering.",
-        "I worked part-time in a restaurant.",
-        "Then I worked full-time at another restaurant.",
-        "I also taught A-level physics in an extracurricular class for 6 months as a part time job.",
-        "I became the supervisor at the restaurant.",
-        "I saved some money and quit to focus on coding.",
-        "I began self-learning coding at the end of 2023, and although the time and effort I could dedicate varied across different periods, I have never stopped moving forward in this direction."
-    ];
-
-
     // animate white part when entering about section
     useEffect(() => {
         if (!whitePart.current) return;
@@ -56,12 +44,15 @@ export default function About() {
                 }
             })
             gsap.fromTo(greenLineRef.current, {
+                opacity: 0,
                 scaleX: 0
             },
                 {
                     scaleX: 0.025,
                     ease: "power2.out",
-                    duration: 3,
+                    duration: 2,
+                    delay: 1,
+                    opacity: 1,
                 })
         }
     }, [pageCurrentSection]);
@@ -89,7 +80,7 @@ export default function About() {
         return () => window.removeEventListener("mousemove", handleRotate);
     }, [pageCurrentSection]);
 
-    // logic about the ball rolling, line extending and year showing
+    // logic about the ball rolling and location update
     useEffect(() => {
         if (pageCurrentSection !== 1) return;
 
@@ -106,7 +97,7 @@ export default function About() {
 
             const angleDeg = currentAngleRef.current;
 
-            deltaXRef.current += angleDeg * 0.0005;
+            deltaXRef.current += angleDeg * 0.0002;
             deltaXRef.current = Math.max(0.025, Math.min(0.975, deltaXRef.current));
 
             const x = deltaXRef.current;
@@ -125,39 +116,188 @@ export default function About() {
 
         return () => cancelAnimationFrame(rafId);
     }, [pageCurrentSection]);
-
+    // green line extending
     useEffect(() => {
-        if (!greenLineRef.current || arrivedTheEnd || !introDoneRef.current) return;
-        if (x > 1.9) setArrivedTheEnd(true)
-        gsap.to(greenLineRef.current, {
-            scaleX: Math.min((x - 1) / 0.9, 1),
+        if (!greenLineRef.current || !introDoneRef.current) return;
+        if (x > 1.97) setArrivedTheEnd(true)
+        const progress = Math.min((x - 1) / 0.9, 1)
+        if (arrivedTheEnd) {
+            gsap.to(greenLineRef.current, {
+                x: Math.sin(currentAngleRef.current * Math.PI / 180) * window.innerHeight * 1 / 5,
+                transformOrigin: 'left center',
+                duration: 0.1,
+                ease: 'power2.out',
+                overwrite: "auto",
+
+            });
+        } else {
+            gsap.to(greenLineRef.current, {
+                scaleX: progress,
+                scaleY: 0.5 + progress * 0.5,
+                x: Math.sin(currentAngleRef.current * Math.PI / 180) * window.innerHeight * 1 / 5,
+                transformOrigin: 'left center',
+                duration: 0.1,
+                ease: 'power2.out',
+                overwrite: "auto",
+
+            });
+        }
+    }, [x, arrivedTheEnd]);
+    // blue line extending
+    useEffect(() => {
+        if (!blueLineRef.current || !introDoneRef.current || !arrivedTheEnd) return;
+        const progress = Math.min((2 - x) / 0.7, 1)
+        gsap.to(blueLineRef.current, {
+            scaleX: progress,
+            scaleY: 0.5 + progress * 0.5,
+            x: Math.sin(currentAngleRef.current * Math.PI / 180) * window.innerHeight * 1 / 5,
+            transformOrigin: 'right center',
             duration: 0.1,
+            ease: 'power2.out',
             overwrite: "auto",
         });
-
-
-
     }, [x, arrivedTheEnd]);
+    // year showing
+    useEffect(() => {
+        if (!yearLineRef.current || !introDoneRef.current) return;
+
+        const years = Array.from(yearLineRef.current.children) as HTMLElement[];
+        let count = 0.125;
+
+        years.forEach((el) => {
+            const dx = (x - 1) - count;
+
+            let opacity = 0;
+            if (arrivedTheEnd || dx > 0) {
+                opacity = 1;
+            } else if (dx > -0.1 && dx <= 0) {
+                opacity = 1 + dx / 0.15;
+            }
+
+            gsap.set(el, {
+                scale: Math.max(2 - Math.abs(dx) * 7, 1),
+                opacity,
+                transformOrigin: 'center center',
+            });
+
+            count += 0.25;
+        });
+    }, [x, arrivedTheEnd]);
+    // text change
+    const texts: string[] = [
+        "I graduated from the University of Nottingham with a Bachelor’s degree in Aerospace Engineering.",
+        "I graduated from the University of Manchester with a Master’s degree in Aerospace Engineering.",
+        "I worked part-time in a restaurant.",
+        "Then I worked full-time at another restaurant.",
+        "I also taught A-level physics in an extracurricular class for 6 months as a part time job.",
+        "I became the supervisor at the restaurant.",
+        "I saved some money and quit to focus on coding.",
+        "I began self-learning coding at the end of 2023, and although the time and effort I could dedicate varied across different periods, I have never stopped moving forward in this direction."
+    ];
+    const intervals: number[][] = [
+        [0.075, 0.175],
+        [0.325, 0.425],
+        [0.425, 0.5],
+        [0.5, 0.85],
+        [0.5, 0.7],
+        [0.75, 0.85],
+        [0.85, 0.95],
+        [1, 1]
+    ]
+    function getTextsByX(x: number) {
+        const result: string[] = [];
+
+        for (let i = 0; i < intervals.length; i++) {
+            const [min, max] = intervals[i];
+            if (x - 1 >= min && x - 1 < max) {
+                result.push(texts[i]);
+            }
+        }
+
+        return result;
+    }
 
     return (
-        <div className="relative w-screen h-screen flex flex-col items-center shrink-0 overflow-hidden">
-            <div className="w-[100vw] h-[50vh] shrink-0 flex flex-col items-center text-white justify-center">
-                <div className="max-w-[75vw] text-[2vw]">
-                    {texts[0]}
+        <div className="relative w-screen h-screen flex flex-col items-center shrink-0 overflow-hidden pointer-events-none">
+            {/* text */}
+            <div className="w-[100vw] h-[50vh] shrink-0 flex flex-col items-center justify-center">
+                <div className="w-[100vw] h-[50vh] flex items-center justify-center">
+                    <div
+                        className="
+                          max-w-[75vw] text-[2vw]
+                          font-inter font-medium
+                          text-[#eaeaea]
+                          justify-center
+                          items-center
+                          flex
+                          flex-col
+                          tracking-[-0.015em]
+                          drop-shadow-[0.15vw_0_0_rgba(180,220,255,0.75)]
+                        "
+                    >
+                        {getTextsByX(x).map((text, idx) => (
+                            <div key={idx}>{text}</div>
+                        ))}
+                    </div>
                 </div>
             </div>
-
+            {/* green line */}
             <div
                 ref={greenLineRef}
-                className="absolute left-0 w-[90vw] h-[1vw] bg-[#2FE91A] bottom-[30vh] rounded-xl origin-left scale-x-0"
-            />
-            <div className="text-black absolute bottom-[17.5vh] flex text-[3vw] justify-around w-[100vw]" ref={yearLineRef}>
-                <div>2022</div>
-                <div>2023</div>
-                <div>2024</div>
-                <div>2025</div>
+                className="absolute left-0 bottom-[30vh] w-[90vw] origin-left scale-x-0 scale-y-0"
+            >
+                <div
+                    className="
+                      h-[0.8vw] rounded-full
+                      bg-gradient-to-r from-[#2FE91A] via-[#6CFF62] to-[#2FE91A]
+                      shadow-[0_0.4vw_1vw_rgba(47,233,26,0.35)]
+                    "
+                />
+                <div
+                    className="
+                      absolute top-[15%] left-0
+                      h-[20%] w-full
+                      rounded-full
+                      bg-white/50
+                      blur-[0.15vw]
+                      pointer-events-none
+                    "
+                />
             </div>
-            <div className="absolute right-0 w-[70vw] h-[1vw] bg-[#1A93E9] bottom-[10vh] rounded-xl" ref={blueLineRef}></div>
+            {/* years */}
+            <div className="text-black absolute bottom-[17.5vh] flex text-[3vw] justify-around w-[100vw]" ref={yearLineRef}>
+                <div className="opacity-0">2022</div>
+                <div className="opacity-0">2023</div>
+                <div className="opacity-0">2024</div>
+                <div className="opacity-0">2025</div>
+            </div>
+            {/* blue line */}
+            <div
+                ref={blueLineRef}
+                className="absolute right-0 bottom-[10vh] w-[70vw] h-[1vw] origin-right scale-x-0 scale-y-0"
+            >
+                <div
+                    className="
+                      h-[0.8vw] rounded-full
+                      bg-gradient-to-r 
+                        from-[#1A93E9] 
+                        via-[#6FC6FF] 
+                        to-[#1A93E9]
+                      shadow-[0_0.4vw_1vw_rgba(26,147,233,0.35)]
+                    "
+                />
+                <div
+                    className="
+                      absolute top-[15%] left-0
+                      h-[20%] w-full
+                      rounded-full
+                      bg-white/55
+                      blur-[0.15vw]
+                      pointer-events-none
+                    "
+                />
+            </div>
+            {/* white background */}
             <div className="w-[100vw] h-[50vw] bg-white/95 drop-shadow-[0_0_8px_rgba(255,255,255,1)] shrink-0 z-[-1]" ref={whitePart}>
             </div>
         </div>
