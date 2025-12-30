@@ -104,7 +104,7 @@ export default function Intro() {
                 {item.char}
             </span>
         ));
-    const text1 = [{ char: "F" }, { char: "o" }, { char: "l" }, { char: "l" }, { char: "o" }, { char: "w" }, { char: " " }, { char: "t" }, { char: "h" }, { char: "e" }, { char: " " }, { char: "B", color: 'transparent', stroke: true }, { char: "a", color: 'transparent', stroke: true }, { char: "l", color: 'transparent', stroke: true }, { char: "l", color: 'transparent', stroke: true }];
+    const text1 = [{ char: "F" }, { char: "o" }, { char: "l" }, { char: "l" }, { char: "o" }, { char: "w" }, { char: " " }, { char: "t" }, { char: "h" }, { char: "e" }, { char: " " }, { char: "B", color: 'transparent', stroke: true }, { char: "a", color: 'rgba(210, 13, 13, 1)', stroke: true }, { char: "l", color: 'transparent', stroke: true }, { char: "l", color: 'transparent', stroke: true }];
     const text2 = [{ char: "I" }, { char: "t" }, { char: " " }, { char: "t" }, { char: "e" }, { char: "l" }, { char: "l" }, { char: "s" }, { char: " " }, { char: "y" }, { char: "o" }, { char: "u" }, { char: " " }, { char: "a" }, { char: "b" }, { char: "o" }, { char: "u" }, { char: "t" }];
 
     return (

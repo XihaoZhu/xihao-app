@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { move } from "@/store/ballControl";
+import { nextSection } from "@/store/pageControl";
 import { Flip } from "gsap/all";
 
 gsap.registerPlugin(Flip)
@@ -14,6 +15,7 @@ export default function About() {
     const { x, y } = useSelector((state: RootState) => state.ballInfo);
 
     const introDoneRef = useRef(false);
+    const arrivedStart = useRef(false)
 
     const ballLocationRef = useRef({ x: 0, y: 0 });
     useEffect(() => {
@@ -65,6 +67,7 @@ export default function About() {
     const handleRotate = (e: MouseEvent) => {
         if (pageCurrentSection !== 1) return;
         if (!introDoneRef.current) return;
+        if (arrivedStart.current) return
 
         const deltaX = e.clientX / window.innerWidth - 0.5;
         const angle = deltaX * 5
@@ -86,6 +89,7 @@ export default function About() {
     // logic about the ball rolling and location update
     useEffect(() => {
         if (pageCurrentSection !== 1) return;
+        if (arrivedStart.current) return
 
         let rafId: number;
         let frame = 0
@@ -258,10 +262,35 @@ export default function About() {
 
     }, [x, arrivedTheEnd])
 
+    // logic and animation about move to next page
+    useEffect(() => {
+        if (arrivedTheEnd && x <= 1.025) {
+            arrivedStart.current = true
+            dispatch(nextSection())
+            const tl = gsap.timeline()
+            tl.to('.content-target', {
+                opacity: 0,
+                duration: 0.5,
+            })
+            tl.to('.rotation-wrapper', {
+                rotateZ: -90,
+                duration: 1,
+                transformOrigin: 'top center',
+                ease: 'power2.out'
+            })
+            tl.to(whitePart.current, {
+                scaleY: 0,
+                duration: 1,
+                transformOrigin: '50% 100%',
+            })
+        }
+
+    }, [x, arrivedTheEnd])
+
     return (
         <div className="relative w-screen h-screen flex flex-col items-center shrink-0 overflow-hidden pointer-events-none">
             {/* text */}
-            <div className="w-[100vw] h-[50vh] shrink-0 flex flex-col items-center justify-center">
+            <div className="w-[100vw] h-[50vh] shrink-0 flex flex-col items-center justify-center content-target">
                 <div className="w-[100vw] h-[50vh] flex items-center justify-center">
                     <div
                         className="
@@ -290,20 +319,21 @@ export default function About() {
                     </div>
                 </div>
             </div>
-            {/* green line */}
-            <div
-                ref={greenLineRef}
-                className="absolute left-0 bottom-[30vh] w-[90vw] origin-left scale-x-0 scale-y-0"
-            >
+            <div className="content-target absolute w-screen h-screen">
+                {/* green line */}
                 <div
-                    className="
+                    ref={greenLineRef}
+                    className="absolute left-0 bottom-[30vh] w-[90vw] origin-left scale-x-0 scale-y-0"
+                >
+                    <div
+                        className="
                       h-[0.8vw] rounded-full
                       bg-gradient-to-r from-[#2FE91A] via-[#6CFF62] to-[#2FE91A]
                       shadow-[0_0.4vw_1vw_rgba(47,233,26,0.35)]
                     "
-                />
-                <div
-                    className="
+                    />
+                    <div
+                        className="
                       absolute top-[15%] left-0
                       h-[20%] w-full
                       rounded-full
@@ -311,22 +341,22 @@ export default function About() {
                       blur-[0.15vw]
                       pointer-events-none
                     "
-                />
-            </div>
-            {/* years */}
-            <div className="text-black absolute bottom-[17.5vh] flex text-[3vw] justify-around w-[100vw]" ref={yearLineRef}>
-                <div className="opacity-0">2022</div>
-                <div className="opacity-0">2023</div>
-                <div className="opacity-0">2024</div>
-                <div className="opacity-0">2025</div>
-            </div>
-            {/* blue line */}
-            <div
-                ref={blueLineRef}
-                className="absolute right-0 bottom-[10vh] w-[70vw] h-[1vw] origin-right scale-x-0 scale-y-0"
-            >
+                    />
+                </div>
+                {/* years */}
+                <div className="text-black absolute bottom-[17.5vh] flex text-[3vw] justify-around w-[100vw]" ref={yearLineRef}>
+                    <div className="opacity-0">2022</div>
+                    <div className="opacity-0">2023</div>
+                    <div className="opacity-0">2024</div>
+                    <div className="opacity-0">2025</div>
+                </div>
+                {/* blue line */}
                 <div
-                    className="
+                    ref={blueLineRef}
+                    className="absolute right-0 bottom-[10vh] w-[70vw] h-[1vw] origin-right scale-x-0 scale-y-0"
+                >
+                    <div
+                        className="
                       h-[0.8vw] rounded-full
                       bg-gradient-to-r 
                         from-[#1A93E9] 
@@ -334,9 +364,9 @@ export default function About() {
                         to-[#1A93E9]
                       shadow-[0_0.4vw_1vw_rgba(26,147,233,0.35)]
                     "
-                />
-                <div
-                    className="
+                    />
+                    <div
+                        className="
                       absolute top-[15%] left-0
                       h-[20%] w-full
                       rounded-full
@@ -344,10 +374,13 @@ export default function About() {
                       blur-[0.15vw]
                       pointer-events-none
                     "
-                />
+                    />
+                </div>
             </div>
             {/* white background */}
-            <div className="w-[100vw] h-[50vw] bg-white/95 drop-shadow-[0_0_8px_rgba(255,255,255,1)] shrink-0 z-[-1]" ref={whitePart}>
+            <div className="rotation-wrapper z-[-1]">
+                <div className="w-[100vw] h-[50vw] bg-white/95 drop-shadow-[0_0_8px_rgba(255,255,255,1)] shrink-0" ref={whitePart}>
+                </div>
             </div>
         </div>
     );

@@ -47,7 +47,7 @@ export default function Home() {
     });
   }
 
-  // when move to about section the viewport moves
+  // when move section the viewport moves
   useEffect(() => {
     if (pageCurrentSection == 1) {
       gsap.to(biggestContainerRef.current, {
@@ -56,8 +56,14 @@ export default function Home() {
         ease: "power2.inOut",
       })
     }
+    else if (pageCurrentSection == 2) {
+      gsap.to(biggestContainerRef.current, {
+        x: -windowWidthRef.current * 2,
+        duration: 1,
+        delay: 3.5,
+      })
+    }
   }, [pageCurrentSection]);
-
 
   // when move to about section the ball moves
   useEffect(() => {
@@ -86,6 +92,34 @@ export default function Home() {
     }
   }, [pageCurrentSection]);
 
+  // when move to current section the ball moves
+  useEffect(() => {
+    if (pageCurrentSection === 2) {
+      const tl = gsap.timeline()
+      tl.to(ballRef.current, { y: windowHeightRef.current - 0.05 * windowWidthRef.current, duration: 1, ease: 'power2.out', delay: 0.5 })
+      tl.to(ballRef.current, {
+        y: 0.5 * windowHeightRef.current - 0.05 * windowWidthRef.current,
+        x: 1.5 * windowWidthRef.current - 0.05 * windowWidthRef.current,
+        scale: 3,
+        duration: 2,
+        ease: 'power1.inOut'
+      }, '>')
+      tl.to(ballRef.current, {
+        y: 0.5 * windowHeightRef.current - 0.05 * windowWidthRef.current,
+        x: 2.5 * windowWidthRef.current - 0.05 * windowWidthRef.current,
+        duration: 1,
+        onComplete: () => {
+          dispatch(
+            move({
+              y: 0.5,
+              x: 2.5,
+            })
+          );
+        },
+      }, '>')
+    }
+  }, [pageCurrentSection]);
+
   // handle resizing of window
   useEffect(() => {
     const handleResize = () => {
@@ -99,7 +133,11 @@ export default function Home() {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current,
         });
-      };
+      } else if (pageCurrentSection == 2) {
+        gsap.to(biggestContainerRef.current, {
+          x: -windowWidthRef.current * 2,
+        });
+      }
 
       handleBallMove();
     }
