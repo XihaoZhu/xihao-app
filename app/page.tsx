@@ -3,11 +3,12 @@
 import { use, useEffect, useRef } from "react";
 import About from "./components/about/about";
 import Intro from "./components/intro/intro";
+import Current from "./components/current/current";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { gsap } from "gsap";
 import { nextSection } from "@/store/pageControl";
-import { move } from "@/store/ballControl";
+import { move, resize } from "@/store/ballControl";
 
 
 
@@ -17,6 +18,9 @@ export default function Home() {
   const { x, y } = useSelector((state: RootState) => state.ballInfo);
   const ballLocationRef = useRef({ x, y });
   useEffect(() => { ballLocationRef.current = { x, y }; }, [x, y]);
+  const { scale } = useSelector((state: RootState) => state.ballInfo)
+  const ballScale = useRef({ scale })
+  useEffect(() => { ballScale.current = { scale } }, [scale])
 
   const windowHeightRef = useRef(0);
   const windowWidthRef = useRef(0);
@@ -27,6 +31,8 @@ export default function Home() {
   const ballRef = useRef<HTMLDivElement>(null);
   const movementX = useRef(0);
 
+  const dispatch = useDispatch();
+
   // initialize windowHeightRef and windowWidthRef
   useEffect(() => {
     if (!window) return;
@@ -34,7 +40,6 @@ export default function Home() {
     windowWidthRef.current = window.innerWidth;
   }, []);
 
-  const dispatch = useDispatch();
 
   // update ball position function
   const handleBallMove = (duration?: number, ease?: string) => {
@@ -46,7 +51,15 @@ export default function Home() {
       ease: ease || "power3.Out",
     });
   }
-
+  // update ball scale function
+  const handleBallScale = (duration?: number, ease?: string) => {
+    gsap.to(ballRef.current, {
+      scale: ballScale.current.scale,
+      transformOrigin: '50% 50%',
+      duration: duration || 2,
+      ease: ease || 'power3.Out'
+    })
+  }
   // when move section the viewport moves
   useEffect(() => {
     if (pageCurrentSection == 1) {
@@ -96,17 +109,17 @@ export default function Home() {
   useEffect(() => {
     if (pageCurrentSection === 2) {
       const tl = gsap.timeline()
-      tl.to(ballRef.current, { y: windowHeightRef.current - 0.05 * windowWidthRef.current, duration: 1, ease: 'power2.out', delay: 0.5 })
+      tl.to(ballRef.current, { y: windowHeightRef.current - 0.05 * windowWidthRef.current, duration: 1, ease: 'power2.out', transformOrigin: '50% 50%', delay: 0.5 })
       tl.to(ballRef.current, {
-        y: 0.5 * windowHeightRef.current - 0.05 * windowWidthRef.current,
-        x: 1.5 * windowWidthRef.current - 0.05 * windowWidthRef.current,
+        y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
+        x: 1.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
         scale: 3,
         duration: 2,
-        ease: 'power1.inOut'
+        ease: 'power1.inOut',
       }, '>')
       tl.to(ballRef.current, {
-        y: 0.5 * windowHeightRef.current - 0.05 * windowWidthRef.current,
-        x: 2.5 * windowWidthRef.current - 0.05 * windowWidthRef.current,
+        y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
+        x: 2.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
         duration: 1,
         onComplete: () => {
           dispatch(
@@ -114,7 +127,9 @@ export default function Home() {
               y: 0.5,
               x: 2.5,
             })
-          );
+          )
+          dispatch(resize({ scale: 3 }));
+          waitCurAni.current = false
         },
       }, '>')
     }
@@ -200,6 +215,15 @@ export default function Home() {
     handleBallMove(0.1);
   }, [x, y, pageCurrentSection, hasMovedtoAbout.current]);
 
+  // ball control in current page
+  const waitCurAni = useRef(true)
+  useEffect(() => {
+    if (pageCurrentSection !== 2) return;
+    if (waitCurAni.current) return
+    handleBallMove()
+    handleBallScale()
+  }, [x, y, pageCurrentSection, scale]);
+
   return (
     <div className="bg-black h-screen flex overflow-hidden w-screen relative" >
       <div
@@ -218,6 +242,7 @@ export default function Home() {
         ></div>
         <Intro />
         <About />
+        <Current />
       </div>
     </div>
   );

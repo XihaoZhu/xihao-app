@@ -62,7 +62,6 @@ export default function About() {
         }
     }, [pageCurrentSection]);
 
-
     // logic about the rotation of white part
     const handleRotate = (e: MouseEvent) => {
         if (pageCurrentSection !== 1) return;
