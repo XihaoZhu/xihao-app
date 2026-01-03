@@ -43,17 +43,19 @@ export default function Current() {
                     overwrite: 'auto',
                     stroke: '#00FF00',
                     onComplete: () => {
-                        dispatch(resize({ scale: 5 }))
+                        dispatch(resize({ scale: 10 }))
                         dispatch(move({ x: 2, y: 1 }))
                     }
                 })
                 tl.to(bottom.current, {
                     opacity: 0,
                     duration: 1,
+                    pointerEvents: 'none'
                 }, '<')
                 tl.to(leftTop.current, {
                     opacity: 0,
                     duration: 1,
+                    pointerEvents: 'none'
                 }, '<')
                 tl.to(svg, {
                     transformOrigin: '0 100%',
@@ -89,11 +91,13 @@ export default function Current() {
                 })
                 tl.to(bottom.current, {
                     opacity: 1,
-                    duration: 1
+                    duration: 1,
+                    pointerEvents: 'auto'
                 })
                 tl.to(leftTop.current, {
                     opacity: 1,
-                    duration: 1
+                    duration: 1,
+                    pointerEvents: 'auto'
                 }, '<')
                 tl.to(line, {
                     strokeDashoffset: 0,
@@ -138,17 +142,19 @@ export default function Current() {
                     overwrite: 'auto',
                     stroke: '#00FF00',
                     onComplete: () => {
-                        dispatch(resize({ scale: 5 }))
+                        dispatch(resize({ scale: 10 }))
                         dispatch(move({ x: 2.5, y: 0 }))
                     }
                 })
                 tl.to(rightTop.current, {
                     opacity: 0,
-                    duration: 1
+                    duration: 1,
+                    pointerEvents: 'none'
                 }, '<')
                 tl.to(leftTop.current, {
                     opacity: 0,
                     duration: 1,
+                    pointerEvents: 'none'
                 }, '<')
                 tl.to(svg, {
                     transformOrigin: '50% 0%',
@@ -183,11 +189,13 @@ export default function Current() {
                 })
                 tl.to(rightTop.current, {
                     opacity: 1,
-                    duration: 1
+                    duration: 1,
+                    pointerEvents: 'auto'
                 })
                 tl.to(leftTop.current, {
                     opacity: 1,
-                    duration: 1
+                    duration: 1,
+                    pointerEvents: 'auto'
                 }, '<')
                 tl.to(line, {
                     strokeDashoffset: 0,
@@ -246,6 +254,7 @@ export default function Current() {
 
     return (
         <div className="w-screen h-screen shrink-0 relative opacity-0" ref={biggestContainer}>
+            {/* top left heart */}
             <svg
                 viewBox="0 0 100 100"
                 xmlns="http://www.w3.org/2000/svg"
@@ -283,6 +292,7 @@ export default function Current() {
                 />
             </svg>
 
+            {/* top right square */}
             <svg
                 className="w-[10vw] absolute bottom-[50%] left-[50%]"
                 viewBox="0 0 100 100"
@@ -334,6 +344,24 @@ export default function Current() {
                     strokeDasharray={'10 80 100'}
                 />
             </svg>
+            {/* animation for when in square */}
+            <svg
+                viewBox="0 0 100 100"
+                className="w-[40vw] h-[40vw] absolute"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <circle
+                    cx="50"
+                    cy="50"
+                    r="49"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="0.2"
+                />
+            </svg>
+
+
+            {/* bottom rectangular */}
             <svg
                 className="w-[30vw] h-[10vw] absolute top-[50%] left-[35vw]"
                 viewBox="0 0 200 100"
