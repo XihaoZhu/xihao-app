@@ -9,10 +9,11 @@ import type { RootState } from "@/store";
 import { gsap } from "gsap";
 import { nextSection } from "@/store/pageControl";
 import { move, resize } from "@/store/ballControl";
-
+import { emit } from "@/tool/BallEvenBus";
 
 
 export default function Home() {
+
 
   const pageCurrentSection = useSelector((state: RootState) => state.currentPage.currentSection);
   const { x, y } = useSelector((state: RootState) => state.ballInfo);
@@ -32,6 +33,20 @@ export default function Home() {
   const movementX = useRef(0);
 
   const dispatch = useDispatch();
+
+
+  // EventBus on ball
+  useEffect(() => {
+    const el = ballRef.current
+    if (!el) return
+    el.style.pointerEvents = 'auto'
+    const handleClick = () => {
+      emit('BALL_CLICK', undefined)
+    }
+    el.addEventListener('click', handleClick)
+
+    return () => el.removeEventListener('click', handleClick)
+  }, [])
 
   // initialize windowHeightRef and windowWidthRef
   useEffect(() => {
@@ -238,7 +253,8 @@ export default function Home() {
                           w-[5vw] h-[5vw]
                           rounded-full pointer-events-none
                           shadow-[0_0_40px_10px_rgba(255,255,255,0.45),0_0_60px_25px_rgba(200,204,208,0.35),inset_0_0_18px_8px_rgba(255,255,255,0.35),inset_0_0_30px_16px_rgba(40,40,40,0.55)]
-                         "
+                          z-10
+                          "
         ></div>
         <Intro />
         <About />
