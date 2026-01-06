@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { move, resize } from "@/store/ballControl";
 import type { RootState } from "@/store";
 import { on } from "@/tool/BallEvenBus";
+import { RadialMesh } from "./radiaMesh/RadiaMesh";
 
 
 
@@ -359,22 +360,11 @@ export default function Current() {
                     strokeDasharray={'10 80 100'}
                 />
             </svg>
-            {/* animation for when in square */}
-            <svg
-                viewBox="0 0 100 100"
-                className="w-[40vw] h-[40vw] absolute"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="49"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="0.2"
-                />
-            </svg>
 
+            {/* radia mesh */}
+            <div className="absolute w-screen h-screen">
+                <RadialMesh />
+            </div>
 
             {/* bottom rectangular */}
             <svg
