@@ -7,14 +7,20 @@ type Point = {
     y: number
 }
 
-// ===== 参数 =====
+// ===== parameters =====
 const ARC_COUNT = 12
-const RADIAL_COUNT = 12
+const RADIAL_COUNT = 24
 const ARC_SEGMENTS = 48
 const START = -15 * Math.PI / 180
 const END = 105 * Math.PI / 180
 const SPAN = END - START
 const rInner = 100
+
+interface RadialMeshProps {
+    collapseCenter: { x: number; y: number } | null
+    mouseEnabled: boolean
+    onMouseMove?: (p: { x: number; y: number }) => void
+}
 
 const polarToPoint = (r: number, theta: number): Point => {
     const x = r * Math.cos(theta)
@@ -22,7 +28,11 @@ const polarToPoint = (r: number, theta: number): Point => {
     return { baseX: x, baseY: y, x, y }
 }
 
-export const RadialMesh: FC = () => {
+export const RadialMesh: FC<RadialMeshProps> = ({
+    collapseCenter,
+    mouseEnabled,
+    onMouseMove,
+}) => {
     const svgRef = useRef<SVGSVGElement | null>(null)
 
     const [viewport, setViewport] = useState<{
@@ -35,6 +45,8 @@ export const RadialMesh: FC = () => {
     const arcsRef = useRef<Point[][]>([])
     const radialsRef = useRef<Point[][]>([])
 
+
+    // handle viewport resize   
     useEffect(() => {
         const update = () => {
             setViewport({
@@ -47,6 +59,8 @@ export const RadialMesh: FC = () => {
         return () => window.removeEventListener('resize', update)
     }, [])
 
+
+    // initialize mesh
     useEffect(() => {
         if (!viewport) return
 
@@ -78,29 +92,40 @@ export const RadialMesh: FC = () => {
         forceUpdate(v => v + 1)
     }, [viewport])
 
+
+    // handle mouse move
+    useEffect(() => {
+        const svg = svgRef.current
+        if (!svg || !collapseCenter) return
+
+
+        const allPoints = [
+            ...arcsRef.current.flat(),
+            ...radialsRef.current.flat(),
+        ]
+        applyCollapse(allPoints, collapseCenter.x, collapseCenter.y)
+        forceUpdate(v => v + 1)
+
+    }, [collapseCenter])
+
+
     useEffect(() => {
         const onMove = (e: MouseEvent) => {
+            if (!mouseEnabled || !onMouseMove) return
             const svg = svgRef.current
             if (!svg) return
 
             const rect = svg.getBoundingClientRect()
-            const mouseX = e.clientX - rect.left
-            const mouseY = rect.bottom - e.clientY
-
-            const allPoints = [
-                ...arcsRef.current.flat(),
-                ...radialsRef.current.flat(),
-            ]
-
-            applyCollapse(allPoints, mouseX, mouseY)
-            forceUpdate(v => v + 1)
+            onMouseMove({
+                x: e.clientX - rect.left,
+                y: rect.bottom - e.clientY,
+            })
         }
 
         window.addEventListener('mousemove', onMove)
-        return () => {
-            window.removeEventListener('mousemove', onMove)
-        }
-    }, [])
+
+        return () => window.removeEventListener('mousemove', onMove)
+    }, [mouseEnabled, onMouseMove])
 
     if (!viewport) return null
 
@@ -148,10 +173,10 @@ export const RadialMesh: FC = () => {
     )
 }
 
-// ===== 坍缩函数 =====
+// ===== animation =====
 function applyCollapse(points: Point[], mouseX: number, mouseY: number) {
-    const radius = 300
-    const strength = 0.5
+    const radius = 200
+    const strength = 0.7
 
     points.forEach(p => {
         const dx = p.baseX - mouseX

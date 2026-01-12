@@ -5,8 +5,9 @@ import { move, resize } from "@/store/ballControl";
 import type { RootState } from "@/store";
 import { on } from "@/tool/BallEvenBus";
 import { RadialMesh } from "./radiaMesh/RadiaMesh";
+import { TextReveal } from "./textReveal/TextReveal";
 
-
+type CollapseSource = 'text' | 'mouse'
 
 export default function Current() {
 
@@ -14,6 +15,23 @@ export default function Current() {
     const { currentSection } = useSelector((state: RootState) => state.currentPage)
     const biggestContainer = useRef<HTMLDivElement>(null)
 
+
+    // design page
+    const [collapseCenter, setCollapseCenter] = useState<{ x: number; y: number } | null>(null)
+    const [source, setSource] = useState<CollapseSource>('text')
+    const [mouseEnabled, setMouseEnabled] = useState(false)
+    const [aboutActive, setAboutActive] = useState(false)
+    const radiaMesh = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!radiaMesh.current) return
+
+        gsap.to(radiaMesh.current, {
+            opacity: aboutActive ? 1 : 0,
+            duration: 0.4,
+            ease: 'power2.out',
+        })
+    }, [aboutActive])
 
     // move in ani
     useEffect(() => {
@@ -82,6 +100,7 @@ export default function Current() {
                     visitedRight.current = true
                     isActivated.current = true
                     svg.style.pointerEvents = 'none'
+                    setAboutActive(true)
                 }
             })
         }
@@ -101,7 +120,7 @@ export default function Current() {
         const onBallClick = () => {
             dispatch(resize({ scale: 3 }))
             dispatch(move({ x: 2.5, y: 0.5 }))
-
+            setAboutActive(false)
             gsap.to(svg, {
                 scale: 1,
                 opacity: 1,
@@ -122,6 +141,7 @@ export default function Current() {
                         (visitedRight.current ? 1 : 0)
                     )
                     isActivated.current = false
+
                 }
             })
         }
@@ -362,8 +382,33 @@ export default function Current() {
             </svg>
 
             {/* radia mesh */}
-            <div className="absolute w-screen h-screen">
-                <RadialMesh />
+            <div ref={radiaMesh}>
+                <div className="absolute w-screen h-screen">
+                    <RadialMesh
+                        collapseCenter={collapseCenter}
+                        mouseEnabled={mouseEnabled}
+                        onMouseMove={p => {
+                            if (source === 'mouse') {
+                                setCollapseCenter(p)
+                            }
+                        }}
+                    />
+                </div>
+                <div>
+                    <TextReveal
+                        text="I’m not an expert, but I can contribute to UI design. In this project, for instance, I used Figma to create the basic layouts. I can also work with Photoshop, After Effects, and 3D software like Blender to create assets. You can see practical examples later in another section."
+                        active={aboutActive}
+                        onCenterChange={(p) => {
+                            if (source === 'text') {
+                                setCollapseCenter(p)
+                            }
+                        }}
+                        onComplete={() => {
+                            setMouseEnabled(true)
+                            setSource('mouse')
+                        }}
+                    />
+                </div>
             </div>
 
             {/* bottom rectangular */}
