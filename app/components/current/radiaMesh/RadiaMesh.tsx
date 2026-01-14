@@ -8,7 +8,7 @@ type Point = {
 }
 
 // ===== parameters =====
-const ARC_COUNT = 12
+const ARC_COUNT = 24
 const RADIAL_COUNT = 24
 const ARC_SEGMENTS = 48
 const START = -15 * Math.PI / 180

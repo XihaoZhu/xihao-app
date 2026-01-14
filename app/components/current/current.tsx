@@ -148,6 +148,7 @@ export default function Current() {
 
         on('BALL_CLICK', () => {
             if (isActivated.current) {
+                setSource('mouse')
                 onBallClick()
             }
         })
