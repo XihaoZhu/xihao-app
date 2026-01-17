@@ -6,6 +6,7 @@ import type { RootState } from "@/store";
 import { on } from "@/tool/BallEvenBus";
 import { RadialMesh } from "./radiaMesh/RadiaMesh";
 import { TextReveal } from "./textReveal/TextReveal";
+import { RadialLines } from "./RadialLines/RadialLines";
 
 type CollapseSource = 'text' | 'mouse'
 
@@ -21,7 +22,9 @@ export default function Current() {
     const [source, setSource] = useState<CollapseSource>('text')
     const [mouseEnabled, setMouseEnabled] = useState(false)
     const [aboutActive, setAboutActive] = useState(false)
+    const [frontendActive, setFrontendActive] = useState(true)
     const radiaMesh = useRef<HTMLDivElement>(null)
+    const radialLines = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!radiaMesh.current) return
@@ -32,6 +35,16 @@ export default function Current() {
             ease: 'power2.out',
         })
     }, [aboutActive])
+
+    useEffect(() => {
+        if (!radialLines.current) return
+
+        gsap.to(radialLines.current, {
+            opacity: frontendActive ? 1 : 0,
+            duration: 0.4,
+            ease: 'power2.out',
+        })
+    }, [frontendActive])
 
     // move in ani
     useEffect(() => {
@@ -149,6 +162,7 @@ export default function Current() {
         on('BALL_CLICK', () => {
             if (isActivated.current) {
                 setSource('mouse')
+                setMouseEnabled(true)
                 onBallClick()
             }
         })
@@ -384,7 +398,7 @@ export default function Current() {
 
             {/* radia mesh */}
             <div ref={radiaMesh}>
-                <div className="absolute w-screen h-screen">
+                <div className="absolute w-screen h-screen top-0 left-0">
                     <RadialMesh
                         collapseCenter={collapseCenter}
                         mouseEnabled={mouseEnabled}
@@ -409,6 +423,13 @@ export default function Current() {
                             setSource('mouse')
                         }}
                     />
+                </div>
+            </div>
+
+            {/* RadialLines */}
+            <div ref={radialLines}>
+                <div className="w-screen h-screen absolute top-0 left-0 cursor-events-none">
+                    <RadialLines />
                 </div>
             </div>
 
