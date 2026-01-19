@@ -22,7 +22,7 @@ export default function Current() {
     const [source, setSource] = useState<CollapseSource>('text')
     const [mouseEnabled, setMouseEnabled] = useState(false)
     const [aboutActive, setAboutActive] = useState(false)
-    const [frontendActive, setFrontendActive] = useState(true)
+    const [frontendActive, setFrontendActive] = useState(false)
     const radiaMesh = useRef<HTMLDivElement>(null)
     const radialLines = useRef<HTMLDivElement>(null)
 
@@ -60,9 +60,9 @@ export default function Current() {
 
     // right top box
     const rightTop = useRef<SVGSVGElement>(null)
-    const hoverTl = useRef<gsap.core.Timeline | null>(null)
-    const isHoveringTl = useRef(false)
-    const isActivated = useRef(false)
+    const hoverTR = useRef<gsap.core.Timeline | null>(null)
+    const isHoveringTR = useRef(false)
+    const topRightActivated = useRef(false)
     useEffect(() => {
         const svg = rightTop.current
         if (!svg) return
@@ -70,11 +70,11 @@ export default function Current() {
         const lines = Array.from(svg.children) as SVGLineElement[]
 
         const onEnter = () => {
-            isHoveringTl.current = true
-            hoverTl.current?.kill()
+            isHoveringTR.current = true
+            hoverTR.current?.kill()
 
             const tl = gsap.timeline()
-            hoverTl.current = tl
+            hoverTR.current = tl
 
             tl.to(lines, {
                 strokeDashoffset: 145,
@@ -83,7 +83,7 @@ export default function Current() {
                 ease: 'power2.out',
                 stagger: 0.05,
                 onComplete: () => {
-                    if (!isHoveringTl.current) return
+                    if (!isHoveringTR.current) return
                     startSecondPhase(tl)
                 }
             })
@@ -111,7 +111,7 @@ export default function Current() {
                 ease: 'power3.out',
                 onComplete: () => {
                     visitedRight.current = true
-                    isActivated.current = true
+                    topRightActivated.current = true
                     svg.style.pointerEvents = 'none'
                     setAboutActive(true)
                 }
@@ -119,8 +119,8 @@ export default function Current() {
         }
 
         const onLeave = () => {
-            isHoveringTl.current = false
-            hoverTl.current?.kill()
+            isHoveringTR.current = false
+            hoverTR.current?.kill()
 
             gsap.to(lines, {
                 strokeDashoffset: 0,
@@ -153,14 +153,14 @@ export default function Current() {
                         (visitedBottom.current ? 1 : 0) +
                         (visitedRight.current ? 1 : 0)
                     )
-                    isActivated.current = false
+                    topRightActivated.current = false
 
                 }
             })
         }
 
         on('BALL_CLICK', () => {
-            if (isActivated.current) {
+            if (topRightActivated.current) {
                 setSource('mouse')
                 setMouseEnabled(true)
                 onBallClick()
@@ -180,6 +180,7 @@ export default function Current() {
     const bottom = useRef<SVGSVGElement>(null)
     const hoverB = useRef<gsap.core.Timeline | null>(null)
     const isHoveringB = useRef(false)
+    const Bactivated = useRef(false)
     useEffect(() => {
         const svg = bottom.current
         if (!svg) return
@@ -198,13 +199,14 @@ export default function Current() {
                 stroke: '#00FF00',
                 duration: 0.8,
                 ease: 'power2.out',
-                stagger: 0.05
+                stagger: 0.05,
+                onComplete: () => {
+                    if (!isHoveringB.current) return
+                    startSecondPhase(tl)
+                }
             })
 
-            tl.add(() => {
-                if (!isHoveringB.current) return
-                startSecondPhase(tl)
-            })
+
         }
 
         const startSecondPhase = (tl: gsap.core.Timeline) => {
@@ -213,7 +215,7 @@ export default function Current() {
                 pointerEvents: 'none',
                 duration: 1,
                 onComplete: () => {
-                    dispatch(resize({ scale: 10 }))
+                    dispatch(resize({ scale: 5 }))
                     dispatch(move({ x: 2.5, y: 0 }))
                 }
             })
@@ -227,6 +229,9 @@ export default function Current() {
                 ease: 'power3.out',
                 onComplete: () => {
                     visitedBottom.current = true
+                    Bactivated.current = true
+                    svg.style.pointerEvents = 'none'
+                    setFrontendActive(true)
                 }
             })
         }
@@ -242,26 +247,42 @@ export default function Current() {
                 ease: 'power2.inOut'
             })
 
+        }
+
+
+        const onBallClick = () => {
+            dispatch(resize({ scale: 3 }))
+            dispatch(move({ x: 2.5, y: 0.5 }))
+            setFrontendActive(false)
             gsap.to(svg, {
                 scale: 1,
                 opacity: 1,
+                x: 0,
                 y: 0,
                 duration: 1,
+                pointerEvents: 'auto',
                 ease: 'power2.out'
             })
 
             gsap.to([rightTop.current, leftTop.current], {
                 opacity: 1,
                 pointerEvents: 'auto',
-                duration: 0.3,
+                duration: 1,
                 onComplete: () => {
-                    setVisitedCount((visitedBottom.current ? 1 : 0) + (visitedRight.current ? 1 : 0))
+                    setVisitedCount(
+                        (visitedBottom.current ? 1 : 0) +
+                        (visitedRight.current ? 1 : 0)
+                    )
+                    Bactivated.current = false
                 }
             })
-
-            dispatch(resize({ scale: 3 }))
-            dispatch(move({ x: 2.5, y: 0.5 }))
         }
+
+        on('BALL_CLICK', () => {
+            if (Bactivated.current) {
+                onBallClick()
+            }
+        })
 
         svg.addEventListener('mouseenter', onEnter)
         svg.addEventListener('mouseleave', onLeave)
@@ -270,6 +291,7 @@ export default function Current() {
             svg.removeEventListener('mouseenter', onEnter)
             svg.removeEventListener('mouseleave', onLeave)
         }
+
     }, [])
 
 
@@ -429,7 +451,10 @@ export default function Current() {
             {/* RadialLines */}
             <div ref={radialLines}>
                 <div className="w-screen h-screen absolute top-0 left-0 cursor-events-none">
-                    <RadialLines />
+                    <RadialLines active={frontendActive} />
+                </div>
+                <div className="absolute top-0 left-0 text-white">
+                    test
                 </div>
             </div>
 
