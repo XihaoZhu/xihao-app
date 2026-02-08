@@ -1,9 +1,10 @@
 'use client';
 
 import { use, useEffect, useRef } from "react";
-import About from "./components/about/about";
+import About from "./components/about/About";
 import Intro from "./components/intro/intro";
 import Current from "./components/current/current";
+import History from "./components/history/History";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { gsap } from "gsap";
@@ -91,6 +92,13 @@ export default function Home() {
         delay: 3.5,
       })
     }
+    else if (pageCurrentSection == 3) {
+      gsap.to(biggestContainerRef.current, {
+        x: -windowWidthRef.current * 3,
+        ease: "power1.inOut",
+        duration: 1,
+      })
+    }
   }, [pageCurrentSection]);
 
   // when move to about section the ball moves
@@ -148,6 +156,27 @@ export default function Home() {
         },
       }, '>')
     }
+  }, [pageCurrentSection]);
+
+  // when move to history section the ball moves
+  useEffect(() => {
+    const tl = gsap.timeline()
+    if (pageCurrentSection === 3) {
+      tl.to(ballRef.current, {
+        y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
+        x: 3.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
+        duration: 1,
+        onComplete: () => {
+          dispatch(
+            move({
+              y: 0.5,
+              x: 3.5,
+            })
+          )
+        },
+      }, '>')
+    }
+    return () => { tl?.kill() }
   }, [pageCurrentSection]);
 
   // handle resizing of window
@@ -259,6 +288,7 @@ export default function Home() {
         <Intro />
         <About />
         <Current />
+        <History />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { RadialMesh } from "./radiaMesh/RadiaMesh";
 import { TextReveal } from "./textReveal/TextReveal";
 import { RadialLines } from "./RadialLines/RadialLines";
 import { Wheel } from "./Wheel/Wheel";
+import { nextSection } from "@/store/pageControl";
 
 type CollapseSource = 'text' | 'mouse'
 
@@ -298,37 +299,75 @@ export default function Current() {
 
     // leftTop box
     const leftTop = useRef<SVGSVGElement>(null)
-    const topLeftLine = useRef<SVGPathElement>(null)
+    const topLeftLine = useRef<SVGPolygonElement>(null)
     const visitedRight = useRef<boolean>(false)
     const visitedBottom = useRef<boolean>(false)
     const [visitedCount, setVisitedCount] = useState(0);
+    const shouldStopRef = useRef(false);
     useEffect(() => {
         const el = topLeftLine.current;
-        if (!el) return;
+        if (!el || !rightTop.current) return;
 
         const tl = gsap.timeline();
 
         tl.to(el, {
-            strokeDashoffset: 270 - visitedCount * 130,
+            strokeDashoffset: 321 - visitedCount * 160.5,
             duration: 1,
             ease: 'power1.inOut',
         });
         if (visitedCount == 2) {
             tl.to(el, {
+                fill: "#FFDB58",
+            })
+            const tween = gsap.to(el, {
                 transformOrigin: '50% 50%',
-                opacity: 0.5,
+                opacity: 0.75,
                 scale: 0.9,
                 duration: 0.75,
                 ease: 'power1.inOut',
                 yoyo: true,
-                repeat: -1
+                repeat: -1,
+                delay: 0.2,
+                onRepeat: () => {
+                    if (shouldStopRef.current) {
+                        tween.repeat(0);
+                    }
+                }
+            });
+
+            tl.add(tween, '<');
+        }
+
+        const moveToHistory = () => {
+            if (visitedCount < 2) return
+
+            shouldStopRef.current = true
+            tl.to([rightTop.current, bottom.current], {
+                opacity: 0,
+                pointerEvents: 'none',
+                duration: 1,
+            })
+            tl.to(leftTop.current, {
+                x: 1 * window.innerWidth,
+                ease: 'power1.inOut',
+                duration: 1,
+                onStart: () => {
+                    dispatch(nextSection())
+                }
             })
         }
-    }, [visitedCount]);
+
+        el.addEventListener('click', moveToHistory)
+
+        return () => {
+            el.removeEventListener('click', moveToHistory)
+        }
+
+    }, [visitedCount, shouldStopRef.current]);
 
     return (
-        <div className="w-screen h-screen shrink-0 relative opacity-0" ref={biggestContainer}>
-            {/* top left heart */}
+        <div className="w-screen h-screen shrink-0 relative opacity-0 overflow-visible" ref={biggestContainer}>
+            {/* top left triangle */}
             <svg
                 viewBox="0 0 100 100"
                 xmlns="http://www.w3.org/2000/svg"
@@ -344,23 +383,15 @@ export default function Current() {
                         </feMerge>
                     </filter>
                 </defs>
-                <path
-                    d="
-                      M50 92
-                      C35 78, 10 60, 10 38
-                      C10 18, 28 12, 40 22
-                      C46 27, 48 32, 50 36
-                      C52 32, 54 27, 60 22
-                      C72 12, 90 18, 90 38
-                      C90 60, 65 78, 50 92
-                      Z
-                    "
+                <polygon
+                    points="49,0 0,99 99,99"
                     fill="none"
-                    stroke="red"
-                    strokeDasharray={'270'}
-                    strokeDashoffset={'270'}
+                    stroke="#FFDB58"
                     strokeWidth="2"
                     strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray="321"
+                    strokeDashoffset="321"
                     ref={topLeftLine}
                     filter="url(#glow)"
                 />
