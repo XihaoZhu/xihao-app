@@ -81,7 +81,7 @@ export const RadialLines: FC<{ active: boolean }> =
             if (!active) return
             const tl = gsap.timeline()
             tl.to('.rotatingTarget', {
-                rotation: 36,
+                rotation: '+=36',
                 transformOrigin: `${cx}px ${cy}px`,
                 ease: 'none',
                 duration: 4,

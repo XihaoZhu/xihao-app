@@ -7,6 +7,7 @@ import { on } from "@/tool/BallEvenBus";
 import { RadialMesh } from "./radiaMesh/RadiaMesh";
 import { TextReveal } from "./textReveal/TextReveal";
 import { RadialLines } from "./RadialLines/RadialLines";
+import { Wheel } from "./Wheel/Wheel";
 
 type CollapseSource = 'text' | 'mouse'
 
@@ -453,8 +454,8 @@ export default function Current() {
                 <div className="w-screen h-screen absolute top-0 left-0 cursor-events-none">
                     <RadialLines active={frontendActive} />
                 </div>
-                <div className="absolute top-0 left-0 text-white">
-                    test
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-white w-[80vh] h-[80vh]">
+                    <Wheel />
                 </div>
             </div>
 

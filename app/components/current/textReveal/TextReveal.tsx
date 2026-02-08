@@ -73,7 +73,7 @@ export const TextReveal: FC<TextRevealProps> = ({
             ref={containerRef}
             className="w-screen h-screen flex items-center justify-center pointer-events-none relative"
         >
-            <div className="absolute right-20 top-50 text-white text-3xl md:text-5xl font-medium text-center leading-25 w-3/5 text-right">
+            <div className="absolute right-20 top-[10vh] text-white text-[3vw] font-medium text-center leading-[10vh] w-3/5 text-right">
                 {words.map((word, i) => (
                     <span
                         key={i}
