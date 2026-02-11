@@ -315,23 +315,29 @@ export default function Current() {
             duration: 1,
             ease: 'power1.inOut',
         });
+
         if (visitedCount == 2) {
             tl.to(el, {
                 fill: "#FFDB58",
             })
+            let isReturningToStart = false
             const tween = gsap.to(el, {
                 transformOrigin: '50% 50%',
                 opacity: 0.75,
                 scale: 0.9,
                 duration: 0.75,
                 ease: 'power1.inOut',
-                yoyo: true,
                 repeat: -1,
+                yoyo: true,
                 delay: 0.2,
                 onRepeat: () => {
-                    if (shouldStopRef.current) {
-                        tween.repeat(0);
+                    if (isReturningToStart) {
+                        if (shouldStopRef.current) {
+                            tween.pause();
+                            return;
+                        }
                     }
+                    isReturningToStart = !isReturningToStart;
                 }
             });
 
@@ -342,19 +348,31 @@ export default function Current() {
             if (visitedCount < 2) return
 
             shouldStopRef.current = true
+            gsap.killTweensOf([rightTop.current, bottom.current])
             tl.to([rightTop.current, bottom.current], {
                 opacity: 0,
                 pointerEvents: 'none',
-                duration: 1,
-            })
-            tl.to(leftTop.current, {
-                x: 1 * window.innerWidth,
                 ease: 'power1.inOut',
                 duration: 1,
-                onStart: () => {
-                    dispatch(nextSection())
-                }
             })
+            setTimeout(() => {
+                gsap.killTweensOf([el, leftTop.current])
+                tl.clear()
+                tl.to(leftTop.current, {
+                    x: 1 * window.innerWidth,
+                    ease: 'none',
+                    duration: 1,
+                    onStart: () => {
+                        dispatch(nextSection())
+                    },
+                    onComplete: () => {
+                        // leftTop.current!.style.pointerEvents = 'none'
+                        // leftTop.current!.style.opacity = '0'
+                    }
+
+                })
+                tl.restart()
+            }, 1000)
         }
 
         el.addEventListener('click', moveToHistory)

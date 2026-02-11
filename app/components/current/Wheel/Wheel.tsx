@@ -17,14 +17,14 @@ export const Wheel: FC<WheelProps> = ({
     useEffect(() => {
         if (!text1Ref.current || !text2Ref.current) return;
 
-        if (!tl.current) {
-            tl.current = gsap.timeline({
-                repeat: -1,
-                paused: false
-            });
+        if (tl.current) {
+            tl.current.kill()
         }
 
-        const timeline = tl.current;
+        const timeline = gsap.timeline({
+            repeat: -1,
+        });
+        tl.current = timeline;
         timeline.to(text1Ref.current, {
             rotate: '-=360',
             transformOrigin: "50% 50%",

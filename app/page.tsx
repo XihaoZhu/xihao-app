@@ -95,7 +95,7 @@ export default function Home() {
     else if (pageCurrentSection == 3) {
       gsap.to(biggestContainerRef.current, {
         x: -windowWidthRef.current * 3,
-        ease: "power1.inOut",
+        ease: "none",
         duration: 1,
       })
     }
@@ -155,16 +155,17 @@ export default function Home() {
           waitCurAni.current = false
         },
       }, '>')
+
     }
   }, [pageCurrentSection]);
 
   // when move to history section the ball moves
   useEffect(() => {
-    const tl = gsap.timeline()
     if (pageCurrentSection === 3) {
-      tl.to(ballRef.current, {
+      gsap.to(ballRef.current, {
         y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
         x: 3.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
+        ease: 'none',
         duration: 1,
         onComplete: () => {
           dispatch(
@@ -174,9 +175,8 @@ export default function Home() {
             })
           )
         },
-      }, '>')
+      })
     }
-    return () => { tl?.kill() }
   }, [pageCurrentSection]);
 
   // handle resizing of window
