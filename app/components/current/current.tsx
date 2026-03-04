@@ -9,6 +9,7 @@ import { TextReveal } from "./textReveal/TextReveal";
 import { RadialLines } from "./RadialLines/RadialLines";
 import { Wheel } from "./Wheel/Wheel";
 import { nextSection } from "@/store/pageControl";
+import { useCallback } from "react";
 
 type CollapseSource = 'text' | 'mouse'
 
@@ -177,6 +178,22 @@ export default function Current() {
             svg.removeEventListener('mouseleave', onLeave)
         }
     }, [])
+    const handleMouseMove = useCallback((p: { x: number; y: number }) => {
+        if (source === 'mouse') {
+            setCollapseCenter(prev => {
+                if (!prev) return p
+
+                const dx = Math.abs(prev.x - p.x)
+                const dy = Math.abs(prev.y - p.y)
+
+                if (dx < 1 && dy < 1) {
+                    return prev
+                }
+
+                return p
+            })
+        }
+    }, [source]);
 
     // bottom box
     const bottom = useRef<SVGSVGElement>(null)
@@ -303,15 +320,16 @@ export default function Current() {
     const visitedRight = useRef<boolean>(false)
     const visitedBottom = useRef<boolean>(false)
     const [visitedCount, setVisitedCount] = useState(0);
-    const shouldStopRef = useRef(false);
+    const [shouldStopRef, setShouldStopRef] = useState(false);
     useEffect(() => {
         const el = topLeftLine.current;
         if (!el || !rightTop.current) return;
 
         const tl = gsap.timeline();
+        console.log('Visited count:', visitedCount);
 
         tl.to(el, {
-            strokeDashoffset: 321 - visitedCount * 160.5,
+            strokeDashoffset: 20 - visitedCount * (20 / 2),
             duration: 1,
             ease: 'power1.inOut',
         });
@@ -332,7 +350,7 @@ export default function Current() {
                 delay: 0.2,
                 onRepeat: () => {
                     if (isReturningToStart) {
-                        if (shouldStopRef.current) {
+                        if (shouldStopRef) {
                             tween.pause();
                             return;
                         }
@@ -347,7 +365,7 @@ export default function Current() {
         const moveToHistory = () => {
             if (visitedCount < 2) return
 
-            shouldStopRef.current = true
+            setShouldStopRef(true)
             gsap.killTweensOf([rightTop.current, bottom.current])
             tl.to([rightTop.current, bottom.current], {
                 opacity: 0,
@@ -381,15 +399,15 @@ export default function Current() {
             el.removeEventListener('click', moveToHistory)
         }
 
-    }, [visitedCount, shouldStopRef.current]);
+    }, [visitedCount, shouldStopRef]);
 
     return (
         <div className="w-screen h-screen shrink-0 relative opacity-0 overflow-visible" ref={biggestContainer}>
-            {/* top left triangle */}
+            {/* top left circle */}
             <svg
                 viewBox="0 0 100 100"
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-[10vw] h-[10vw] bottom-[50%] right-[50%] absolute z-11"
+                className="w-[10vw] h-[10vw] bottom-[50.5%] right-[50.5%] absolute z-11 overflow-visible"
                 ref={leftTop}
             >
                 <defs>
@@ -401,16 +419,16 @@ export default function Current() {
                         </feMerge>
                     </filter>
                 </defs>
-                <polygon
-                    points="49,0 0,99 99,99"
+                <circle
+                    cx="50"
+                    cy="50"
+                    r="10"
                     fill="none"
                     stroke="#FFDB58"
                     strokeWidth="2"
                     strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeDasharray="321"
-                    strokeDashoffset="321"
-                    ref={topLeftLine}
+                    strokeDasharray={62.8}
+                    strokeDashoffset="62.8"
                     filter="url(#glow)"
                 />
             </svg>
@@ -474,11 +492,7 @@ export default function Current() {
                     <RadialMesh
                         collapseCenter={collapseCenter}
                         mouseEnabled={mouseEnabled}
-                        onMouseMove={p => {
-                            if (source === 'mouse') {
-                                setCollapseCenter(p)
-                            }
-                        }}
+                        onMouseMove={handleMouseMove}
                     />
                 </div>
                 <div>
@@ -487,7 +501,18 @@ export default function Current() {
                         active={aboutActive}
                         onCenterChange={(p) => {
                             if (source === 'text') {
-                                setCollapseCenter(p)
+                                setCollapseCenter(prev => {
+                                    if (!prev) return p
+
+                                    const dx = Math.abs(prev.x - p.x)
+                                    const dy = Math.abs(prev.y - p.y)
+
+                                    if (dx < 1 && dy < 1) {
+                                        return prev
+                                    }
+
+                                    return p
+                                })
                             }
                         }}
                         onComplete={() => {

@@ -10,7 +10,7 @@ type Point = {
 // ===== parameters =====
 const ARC_COUNT = 24
 const RADIAL_COUNT = 24
-const ARC_SEGMENTS = 48
+const ARC_SEGMENTS = 192
 const START = -15 * Math.PI / 180
 const END = 105 * Math.PI / 180
 const SPAN = END - START
@@ -104,7 +104,6 @@ export const RadialMesh: FC<RadialMeshProps> = ({
             ...radialsRef.current.flat(),
         ]
         applyCollapse(allPoints, collapseCenter.x, collapseCenter.y)
-        forceUpdate(v => v + 1)
 
     }, [collapseCenter])
 

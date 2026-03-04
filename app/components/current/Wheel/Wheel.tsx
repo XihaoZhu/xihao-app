@@ -73,7 +73,7 @@ export const Wheel: FC<WheelProps> = ({
             </text>
             <path id="circlePath2" d="M20,100a80,80 0 1,1 160,0a80,80 0 1,1 -160,0"
                 fill="none" />
-            <text className="text-[1vw] font-bold fill-current cursor-default" textLength={480} ref={text2Ref}>
+            <text className="text-[0.5vw] font-bold fill-current cursor-default" textLength={480} ref={text2Ref}>
                 <textPath href="#circlePath2" startOffset="0%">
                     React Vue Next.js ReactNative Taiwind GSAP THREE.js TypeScript ...
                 </textPath>
