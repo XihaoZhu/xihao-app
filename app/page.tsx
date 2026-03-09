@@ -165,14 +165,15 @@ export default function Home() {
       gsap.to(ballRef.current, {
         y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
         x: 3.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
+        scale: 20,
         ease: 'none',
         duration: 1,
         onComplete: () => {
           dispatch(
             move({
-              y: 0.5,
-              x: 3.5,
-            })
+              y: 1,
+              x: 4,
+            }), resize({ scale: 5 })
           )
         },
       })

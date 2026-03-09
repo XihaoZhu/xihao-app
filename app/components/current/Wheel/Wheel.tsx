@@ -75,7 +75,7 @@ export const Wheel: FC<WheelProps> = ({
                 fill="none" />
             <text className="text-[0.5vw] font-bold fill-current cursor-default" textLength={480} ref={text2Ref}>
                 <textPath href="#circlePath2" startOffset="0%">
-                    React Vue Next.js ReactNative Taiwind GSAP THREE.js TypeScript ...
+                    React Vue Next.js ReactNative Tailwind GSAP THREE.js TypeScript ...
                 </textPath>
             </text>
         </svg>

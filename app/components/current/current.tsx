@@ -316,7 +316,7 @@ export default function Current() {
 
     // leftTop box
     const leftTop = useRef<SVGSVGElement>(null)
-    const topLeftLine = useRef<SVGPolygonElement>(null)
+    const topLeftLine = useRef<SVGCircleElement>(null)
     const visitedRight = useRef<boolean>(false)
     const visitedBottom = useRef<boolean>(false)
     const [visitedCount, setVisitedCount] = useState(0);
@@ -326,17 +326,16 @@ export default function Current() {
         if (!el || !rightTop.current) return;
 
         const tl = gsap.timeline();
-        console.log('Visited count:', visitedCount);
 
         tl.to(el, {
-            strokeDashoffset: 20 - visitedCount * (20 / 2),
+            strokeDashoffset: 62.8 - visitedCount * 31.4,
             duration: 1,
             ease: 'power1.inOut',
         });
 
         if (visitedCount == 2) {
             tl.to(el, {
-                fill: "#FFDB58",
+                fill: "#58ff77",
             })
             let isReturningToStart = false
             const tween = gsap.to(el, {
@@ -377,16 +376,12 @@ export default function Current() {
                 gsap.killTweensOf([el, leftTop.current])
                 tl.clear()
                 tl.to(leftTop.current, {
-                    x: 1 * window.innerWidth,
-                    ease: 'none',
+                    opacity: 0,
+                    ease: 'power1.inOut',
                     duration: 1,
-                    onStart: () => {
+                    onComplete: () => {
                         dispatch(nextSection())
                     },
-                    onComplete: () => {
-                        // leftTop.current!.style.pointerEvents = 'none'
-                        // leftTop.current!.style.opacity = '0'
-                    }
 
                 })
                 tl.restart()
@@ -420,14 +415,15 @@ export default function Current() {
                     </filter>
                 </defs>
                 <circle
+                    ref={topLeftLine}
                     cx="50"
                     cy="50"
                     r="10"
                     fill="none"
-                    stroke="#FFDB58"
+                    stroke="#58ff77"
                     strokeWidth="2"
                     strokeLinecap="round"
-                    strokeDasharray={62.8}
+                    strokeDasharray="62.8"
                     strokeDashoffset="62.8"
                     filter="url(#glow)"
                 />
