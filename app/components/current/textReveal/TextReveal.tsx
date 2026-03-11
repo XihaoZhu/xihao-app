@@ -15,7 +15,7 @@ export const TextReveal: FC<TextRevealProps> = ({
     active,
     onCenterChange,
     onComplete,
-    interval = 0.2,
+    interval = 0.1,
 }) => {
     const words = text.split(' ')
 
