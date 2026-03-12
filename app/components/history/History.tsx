@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import SingleCard from "./singleCard/SingleCard"
 
+
 const ContainerWidth = 60
 const ContainerHeightVW = 2 * ContainerWidth
 
@@ -10,24 +11,26 @@ type CardData = {
     y: number
     width: number
     height: number
-    title: string
+    title: string[]
     hoverText: string
     link: string
-    bgColor?: string
+    img?: string
 }
 
 export default function History() {
 
     const cards: CardData[] = [
-        { id: 1, x: 0, y: 0, width: 0.55, height: 0.5, title: "Card 1", hoverText: "Hover text 1", link: "#", bgColor: "bg-red-400" },
-        { id: 2, x: 0.6, y: 0, width: 0.4, height: 0.9, title: "Card 2", hoverText: "Hover text 2", link: "#", bgColor: "bg-blue-400" },
-        { id: 3, x: 0, y: 0.55, width: 0.25, height: 0.7, title: "Card 3", hoverText: "Hover text 3", link: "#", bgColor: "bg-green-400" },
-        { id: 4, x: 0.3, y: 0.55, width: 0.25, height: 0.7, title: "Card 4", hoverText: "Hover text 4", link: "#", bgColor: "bg-yellow-400" },
-        { id: 5, x: 0.6, y: 0.95, width: 0.4, height: 0.3, title: "Card 5", hoverText: "Hover text 5", link: "#", bgColor: "bg-pink-400" },
-        { id: 6, x: 0, y: 1.3, width: 1, height: 0.3, title: "Card 6", hoverText: "Hover text 6", link: "#", bgColor: "bg-purple-400" },
-        { id: 7, x: 0, y: 1.65, width: 0.3, height: 0.3, title: "Card 7", hoverText: "Hover text 7", link: "#", bgColor: "bg-indigo-400" },
-        { id: 8, x: 0.35, y: 1.65, width: 0.3, height: 0.3, title: "Card 8", hoverText: "Hover text 8", link: "#", bgColor: "bg-teal-400" },
-        { id: 9, x: 0.7, y: 1.65, width: 0.3, height: 0.3, title: "Card 9", hoverText: "Hover text 9", link: "#", bgColor: "bg-fuchsia-400" },
+        { id: 1, x: 0, y: 0, width: 0.55, height: 0.5, title: ["Card 1"], hoverText: "Hover text 1", link: "#", img: "bg-red-400" },
+        {
+            id: 2, x: 0.6, y: 0, width: 0.4, height: 0.9, title: ['2023', 'My first project', 'shows detials about the way I self taught coding and some other skills helpful for frontend development'], hoverText: "Hover text 2", link: "#", img: "/assets/FirstP.png"
+        },
+        { id: 3, x: 0, y: 0.55, width: 0.25, height: 0.7, title: ["Card 3"], hoverText: "Hover text 3", link: "#", img: "bg-green-400" },
+        { id: 4, x: 0.3, y: 0.55, width: 0.25, height: 0.7, title: ["Card 4"], hoverText: "Hover text 4", link: "#", img: "bg-yellow-400" },
+        { id: 5, x: 0.6, y: 0.95, width: 0.4, height: 0.3, title: ["Card 5"], hoverText: "Hover text 5", link: "#", img: "bg-pink-400" },
+        { id: 6, x: 0, y: 1.3, width: 1, height: 0.3, title: ["Card 6"], hoverText: "Hover text 6", link: "#", img: "bg-purple-400" },
+        { id: 7, x: 0, y: 1.65, width: 0.3, height: 0.3, title: ["Card 7"], hoverText: "Hover text 7", link: "#", img: "bg-indigo-400" },
+        { id: 8, x: 0.35, y: 1.65, width: 0.3, height: 0.3, title: ["Card 8"], hoverText: "Hover text 8", link: "#", img: "bg-teal-400" },
+        { id: 9, x: 0.7, y: 1.65, width: 0.3, height: 0.3, title: ["Card 9"], hoverText: "Hover text 9", link: "#", img: "bg-fuchsia-400" },
     ]
 
     const requestRef = useRef<number>(0)
@@ -170,7 +173,7 @@ export default function History() {
                                     title={card.title}
                                     hoverText={card.hoverText}
                                     link={card.link}
-                                    bgColor={card.bgColor}
+                                    img={card.img}
                                     x={card.x * ContainerWidth + "vw"}
                                     y={card.y * ContainerWidth + groupPos - offset + "vw"}
                                     topGlowY={topGlowY}

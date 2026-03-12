@@ -2,12 +2,12 @@
 import React from "react"
 
 type CardProps = {
-    bgColor?: string
+    img?: string
     width: string
+    height: string
     x: string
     y: string
-    height: string
-    title: string
+    title: string[]
     hoverText: string
     link: string
     topGlowY: number | null
@@ -15,11 +15,11 @@ type CardProps = {
 }
 
 export default function SingleCard({
-    bgColor = "bg-blue-400",
+    img = "/placeholder.jpg",   // 图片占位
     width,
+    height,
     x,
     y,
-    height,
     title,
     hoverText,
     link,
@@ -32,19 +32,34 @@ export default function SingleCard({
             className="group absolute block overflow-hidden rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300"
             style={{ width, height, left: x, top: y }}
         >
-            {/* background */}
+            {/* Image */}
+            <img
+                src={img}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                style={{
+                    filter: "saturate(0.75) contrast(1.05) brightness(0.9)"
+                }}
+            />
+
+            {/* color overlay (统一色调) */}
             <div
-                className={`absolute inset-0 ${bgColor} transition-transform duration-500 group-hover:scale-110`}
+                className="absolute inset-0"
+                style={{
+                    background:
+                        "linear-gradient(rgba(0,0,0,0.25), rgba(20,0,40,0.35))"
+                }}
             />
 
             {/* title */}
             <div
-                className="absolute bottom-4 left-4 right-4 z-10 text-white font-semibold"
+                className="relative w-full h-full flex flex-col justify-center items-center z-10 text-white font-semibold group-hover:opacity-0 transition-opacity duration-300 px-4 text-center"
                 style={{
                     fontSize: "clamp(14px,1.2vw,22px)"
                 }}
             >
-                {title}
+                {title.map((line, index) => (
+                    <p key={index} className="pt-4">{line}</p>
+                ))}
             </div>
 
             {/* Hover overlay */}
@@ -74,7 +89,7 @@ export default function SingleCard({
 
             {bottomGlowY !== null && (
                 <div
-                    className="absolute left-0 top-0 w-full h-16 pointer-events-none"
+                    className="absolute left-0 w-full h-16 pointer-events-none"
                     style={{
                         top: bottomGlowY + "vw",
                         transform: "translateY(-50%)",

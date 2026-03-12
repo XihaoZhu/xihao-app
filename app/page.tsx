@@ -197,6 +197,10 @@ export default function Home() {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current * 2,
         });
+      } else if (pageCurrentSection == 3) {
+        gsap.to(biggestContainerRef.current, {
+          x: -windowWidthRef.current * 3,
+        });
       }
 
       handleBallMove();
