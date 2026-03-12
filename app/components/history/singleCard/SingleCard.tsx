@@ -10,6 +10,8 @@ type CardProps = {
     title: string
     hoverText: string
     link: string
+    topGlowY: number | null
+    bottomGlowY: number | null
 }
 
 export default function SingleCard({
@@ -21,6 +23,8 @@ export default function SingleCard({
     title,
     hoverText,
     link,
+    topGlowY,
+    bottomGlowY
 }: CardProps) {
     return (
         <a
@@ -34,7 +38,8 @@ export default function SingleCard({
             />
 
             {/* title */}
-            <div className="absolute bottom-4 left-4 right-4 z-10 text-white font-semibold"
+            <div
+                className="absolute bottom-4 left-4 right-4 z-10 text-white font-semibold"
                 style={{
                     fontSize: "clamp(14px,1.2vw,22px)"
                 }}
@@ -53,6 +58,32 @@ export default function SingleCard({
                     {hoverText}
                 </p>
             </div>
+
+            {topGlowY !== null && (
+                <div
+                    className="absolute left-0 w-full h-16 pointer-events-none"
+                    style={{
+                        top: topGlowY + "vw",
+                        transform: "translateY(-50%)",
+                        background:
+                            "linear-gradient(to bottom, transparent, rgba(255,255,255,0.9), transparent)",
+                        filter: "blur(10px)"
+                    }}
+                />
+            )}
+
+            {bottomGlowY !== null && (
+                <div
+                    className="absolute left-0 top-0 w-full h-16 pointer-events-none"
+                    style={{
+                        top: bottomGlowY + "vw",
+                        transform: "translateY(-50%)",
+                        background:
+                            "linear-gradient(to bottom, transparent, rgba(255,255,255,0.9), transparent)",
+                        filter: "blur(10px)"
+                    }}
+                />
+            )}
         </a>
     )
 }

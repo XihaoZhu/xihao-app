@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import SingleCard from "./singleCard/SingleCard"
 
-const ContainerWidth = 60 // 父容器宽度 vw
-const ContainerHeightVW = 2 * ContainerWidth // 父容器总高度
-const ViewportHeightVW = 80 // 可视区高度 vw
+const ContainerWidth = 60
+const ContainerHeightVW = 2 * ContainerWidth
 
 type CardData = {
     id: number
@@ -18,6 +17,7 @@ type CardData = {
 }
 
 export default function History() {
+
     const cards: CardData[] = [
         { id: 1, x: 0, y: 0, width: 0.55, height: 0.5, title: "Card 1", hoverText: "Hover text 1", link: "#", bgColor: "bg-red-400" },
         { id: 2, x: 0.6, y: 0, width: 0.4, height: 0.9, title: "Card 2", hoverText: "Hover text 2", link: "#", bgColor: "bg-blue-400" },
@@ -32,79 +32,155 @@ export default function History() {
 
     const requestRef = useRef<number>(0)
     const velocityRef = useRef(0)
-    const [offset, setOffset] = useState(ContainerHeightVW) // 初始展示第二组
-    const groupPositions = useRef([0, ContainerHeightVW, 2 * ContainerHeightVW]) // 三组初始位置
 
-    const maxSpeed = 2 // 最大滚动速度
-    const damping = 0.92 // 阻尼系数，值越小阻力越大
+    const [offset, setOffset] = useState(ContainerHeightVW)
 
-    // 监听滚轮
+    const groupPositions = useRef([
+        0,
+        ContainerHeightVW,
+        2 * ContainerHeightVW
+    ])
+
+    const [viewportHeightVW, setViewportHeightVW] = useState(0)
+
+    const maxSpeed = 2
+
+    // 把 80vh 转换成 vw
     useEffect(() => {
+
+        const updateVH = () => {
+            const vhToVw = window.innerHeight / window.innerWidth
+            setViewportHeightVW(80 * vhToVw)
+        }
+
+        updateVH()
+
+        window.addEventListener("resize", updateVH)
+
+        return () => window.removeEventListener("resize", updateVH)
+
+    }, [])
+
+    // 滚轮输入
+    useEffect(() => {
+
         const handleWheel = (e: WheelEvent) => {
-            velocityRef.current += e.deltaY * 0.03
-            // 限制最大速度
+
+            velocityRef.current += e.deltaY * 0.003
+
             if (velocityRef.current > maxSpeed) velocityRef.current = maxSpeed
             if (velocityRef.current < -maxSpeed) velocityRef.current = -maxSpeed
         }
+
         window.addEventListener("wheel", handleWheel, { passive: true })
+
         return () => window.removeEventListener("wheel", handleWheel)
+
     }, [])
 
-    // 动画循环
+    // animation loop
     useEffect(() => {
+
         const animate = () => {
-            let newOffset = offset + velocityRef.current
 
-            // 阻尼减速
+            const damping = 0.92
+
             velocityRef.current *= damping
-            // 当速度非常小的时候直接归零，防止无限抖动
-            if (Math.abs(velocityRef.current) < 0.001) velocityRef.current = 0
 
-            // 检查每组是否完全离开可视区，循环移动
-            groupPositions.current = groupPositions.current.map(pos => {
-                // 向下滚动
-                if (velocityRef.current > 0 && pos - newOffset + ContainerHeightVW < 0) {
-                    return pos + 3 * ContainerHeightVW
-                }
-                // 向上滚动
-                if (velocityRef.current < 0 && pos - newOffset > ViewportHeightVW) {
-                    return pos - 3 * ContainerHeightVW
-                }
-                return pos
+            if (Math.abs(velocityRef.current) < 0.001) {
+                velocityRef.current = 0
+            }
+
+            setOffset(prev => {
+
+                let newOffset = prev + velocityRef.current
+
+
+
+
+                groupPositions.current = groupPositions.current.map(pos => {
+
+                    if (velocityRef.current > 0 && pos - newOffset + ContainerHeightVW < 0) {
+                        return pos + 3 * ContainerHeightVW
+                    }
+
+                    if (velocityRef.current < 0 && pos - newOffset > viewportHeightVW) {
+                        return pos - 3 * ContainerHeightVW
+                    }
+
+                    return pos
+                })
+
+                return newOffset
             })
 
-            setOffset(newOffset)
             requestRef.current = requestAnimationFrame(animate)
+
         }
 
         requestRef.current = requestAnimationFrame(animate)
-        return () => cancelAnimationFrame(requestRef.current!)
-    }, [offset])
+
+        return () => cancelAnimationFrame(requestRef.current)
+
+    }, [viewportHeightVW])
 
     return (
+
         <div className="w-screen h-screen flex items-center justify-center z-10">
-            <div
-                className="relative h-[80vh] overflow-hidden flex items-center justify-center"
-                style={{ width: (ContainerWidth + 2) + "vw" }}
-            >
-                <div className="relative h-[80vh]"
-                    style={{ width: ContainerWidth + "vw" }}>
+
+            <div className="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
+
+                <div
+                    className="relative h-[80vh]"
+                    style={{ width: ContainerWidth + "vw" }}
+                >
 
                     {cards.map(card =>
-                        groupPositions.current.map((groupPos, i) => (
-                            <SingleCard
-                                key={`${card.id}-group-${i}`}
-                                width={card.width * ContainerWidth + "vw"}
-                                height={card.height * ContainerWidth + "vw"}
-                                title={card.title}
-                                hoverText={card.hoverText}
-                                link={card.link}
-                                bgColor={card.bgColor}
-                                x={card.x * ContainerWidth + "vw"}
-                                y={card.y * ContainerWidth + groupPos - offset + "vw"}
-                            />
-                        ))
+
+                        groupPositions.current.map((groupPos, i) => {
+
+                            const cardTop =
+                                card.y * ContainerWidth + groupPos - offset
+
+                            const cardHeight =
+                                card.height * ContainerWidth
+
+                            const cardBottom =
+                                cardTop + cardHeight
+
+                            let topGlowY: number | null = null
+                            let bottomGlowY: number | null = null
+
+                            // top edge
+                            if (cardTop < 0 && cardBottom > 0) {
+                                topGlowY = -cardTop
+                            }
+
+                            // bottom edge
+                            if (cardTop < viewportHeightVW && cardBottom > viewportHeightVW) {
+                                bottomGlowY = viewportHeightVW - cardTop
+                            }
+
+                            return (
+
+                                <SingleCard
+                                    key={`${card.id}-group-${i}`}
+                                    width={card.width * ContainerWidth + "vw"}
+                                    height={card.height * ContainerWidth + "vw"}
+                                    title={card.title}
+                                    hoverText={card.hoverText}
+                                    link={card.link}
+                                    bgColor={card.bgColor}
+                                    x={card.x * ContainerWidth + "vw"}
+                                    y={card.y * ContainerWidth + groupPos - offset + "vw"}
+                                    topGlowY={topGlowY}
+                                    bottomGlowY={bottomGlowY}
+                                />
+
+                            )
+                        })
                     )}
+
                 </div>
             </div>
         </div>
