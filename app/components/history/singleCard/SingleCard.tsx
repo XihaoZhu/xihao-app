@@ -12,6 +12,7 @@ type CardProps = {
     link: string
     topGlowY: number | null
     bottomGlowY: number | null
+    filter?: boolean
 }
 
 export default function SingleCard({
@@ -24,7 +25,8 @@ export default function SingleCard({
     hoverText,
     link,
     topGlowY,
-    bottomGlowY
+    bottomGlowY,
+    filter = true,
 }: CardProps) {
     return (
         <a
@@ -42,13 +44,13 @@ export default function SingleCard({
             />
 
             {/* color overlay (统一色调) */}
-            <div
+            {filter && <div
                 className="absolute inset-0"
                 style={{
                     background:
                         "linear-gradient(rgba(0,0,0,0.25), rgba(20,0,40,0.35))"
                 }}
-            />
+            />}
 
             {/* title */}
             <div
