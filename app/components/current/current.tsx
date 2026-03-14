@@ -367,7 +367,7 @@ export default function Current() {
             setShouldStopRef(true)
             gsap.killTweensOf([rightTop.current, bottom.current])
             tl.to([rightTop.current, bottom.current], {
-                opacity: 0,
+                alpha: 0,
                 pointerEvents: 'none',
                 ease: 'power1.inOut',
                 duration: 1,

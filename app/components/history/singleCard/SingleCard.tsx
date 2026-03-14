@@ -8,7 +8,7 @@ type CardProps = {
     x: string
     y: string
     title: string[]
-    hoverText: string
+    hoverText: string[]
     link: string
     topGlowY: number | null
     bottomGlowY: number | null
@@ -32,6 +32,7 @@ export default function SingleCard({
         <a
             href={link}
             className="group absolute block overflow-hidden rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300"
+            target="_blank" rel="noopener noreferrer"
             style={{ width, height, left: x, top: y }}
         >
             {/* Image */}
@@ -54,7 +55,7 @@ export default function SingleCard({
 
             {/* title */}
             <div
-                className="relative w-full h-full flex flex-col justify-center items-center z-10 text-white font-semibold group-hover:opacity-0 transition-opacity duration-300 px-4 text-center"
+                className="relative w-full h-full flex flex-col justify-center items-center z-10 text-white font-semibold group-hover:opacity-0 transition-opacity duration-300 px-4 text-center flex-wrap"
                 style={{
                     fontSize: "clamp(14px,1.2vw,22px)"
                 }}
@@ -65,15 +66,14 @@ export default function SingleCard({
             </div>
 
             {/* Hover overlay */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <p
-                    className="text-white text-center px-4"
-                    style={{
-                        fontSize: "clamp(12px,1vw,18px)"
-                    }}
-                >
-                    {hoverText}
-                </p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100 text-white text-center p-4 flex-wrap"
+                style={{
+                    fontSize: "clamp(14px,1.2vw,22px)"
+                }}>
+
+                {hoverText.map((line, index) => (
+                    <p key={index} className="pt-4">{line}</p>
+                ))}
             </div>
 
             {topGlowY !== null && (

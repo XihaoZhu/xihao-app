@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useRef } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import About from "./components/about/About";
 import Intro from "./components/intro/intro";
 import Current from "./components/current/current";
@@ -11,6 +11,8 @@ import { gsap } from "gsap";
 import { nextSection } from "@/store/pageControl";
 import { move, resize } from "@/store/ballControl";
 import { emit } from "@/tool/BallEvenBus";
+import { MouseLogo } from "./components/mouse";
+
 
 
 export default function Home() {
@@ -77,19 +79,30 @@ export default function Home() {
     })
   }
   // when move section the viewport moves
+
+  const [containerX, setContainerX] = useState(0)
   useEffect(() => {
     if (pageCurrentSection == 1) {
       gsap.to(biggestContainerRef.current, {
         x: -windowWidthRef.current,
         duration: 2,
         ease: "power2.inOut",
+        onUpdate: () => {
+          const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+          setContainerX(x)
+        }
       })
     }
     else if (pageCurrentSection == 2) {
       gsap.to(biggestContainerRef.current, {
         x: -windowWidthRef.current * 2,
         duration: 1,
+        ease: "none",
         delay: 3.5,
+        onUpdate: () => {
+          const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+          setContainerX(x)
+        }
       })
     }
     else if (pageCurrentSection == 3) {
@@ -97,6 +110,21 @@ export default function Home() {
         x: -windowWidthRef.current * 3,
         ease: "none",
         duration: 1,
+        onUpdate: () => {
+          const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+          setContainerX(x)
+        }
+      })
+    }
+    else if (pageCurrentSection == 4) {
+      gsap.to(biggestContainerRef.current, {
+        x: -windowWidthRef.current * 4,
+        ease: "none",
+        duration: 1,
+        onUpdate: () => {
+          const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+          setContainerX(x)
+        }
       })
     }
   }, [pageCurrentSection]);
@@ -144,6 +172,7 @@ export default function Home() {
         y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
         x: 2.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
         duration: 1,
+        ease: 'none',
         onComplete: () => {
           dispatch(
             move({
@@ -192,14 +221,34 @@ export default function Home() {
       if (pageCurrentSection == 1) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current,
+          onUpdate: () => {
+            const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+            setContainerX(x)
+          }
         });
       } else if (pageCurrentSection == 2) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current * 2,
+          onUpdate: () => {
+            const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+            setContainerX(x)
+          }
         });
       } else if (pageCurrentSection == 3) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current * 3,
+          onUpdate: () => {
+            const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+            setContainerX(x)
+          }
+        });
+      } else if (pageCurrentSection == 4) {
+        gsap.to(biggestContainerRef.current, {
+          x: -windowWidthRef.current * 4,
+          onUpdate: () => {
+            const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
+            setContainerX(x)
+          }
         });
       }
 
@@ -274,7 +323,7 @@ export default function Home() {
   }, [x, y, pageCurrentSection, scale]);
 
   return (
-    <div className="bg-black h-screen flex overflow-hidden w-screen relative" >
+    <div className="bg-black h-screen flex overflow-hidden w-screen relative " >
       <div
         className="flex h-auto w-auto p-0 relative"
         ref={biggestContainerRef}
@@ -294,6 +343,7 @@ export default function Home() {
         <About />
         <Current />
         <History />
+        <MouseLogo xJustify={containerX} />
       </div>
     </div>
   );

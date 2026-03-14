@@ -1,37 +1,19 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { use, useEffect, useRef, useState } from "react"
 import SingleCard from "./singleCard/SingleCard"
-
+import { cards } from "./cardsContext"
+import { gsap } from "gsap"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "@/store"
 
 const ContainerWidth = 60
 const ContainerHeightVW = 1.65 * ContainerWidth
 
-type CardData = {
-    id: number
-    x: number
-    y: number
-    width: number
-    height: number
-    title: string[]
-    hoverText: string
-    link: string
-    img?: string
-    filter?: boolean
-}
+
 
 export default function History() {
 
-    const cards: CardData[] = [
-        { id: 1, x: 0, y: 0, width: 0.55, height: 0.5, title: ["Card 1"], hoverText: "Hover text 1", link: "#", img: "/assets/FouthP.png" },
-        {
-            id: 2, x: 0.6, y: 0, width: 0.4, height: 0.9, title: ['2023', 'My first project', 'shows detials about the way I self taught coding and some other skills helpful for frontend development'], hoverText: "Hover text 2", link: "#", img: "/assets/FirstP.png"
-        },
-        { id: 3, x: 0, y: 0.55, width: 0.25, height: 0.7, title: ["Card 3"], hoverText: "Hover text 3", link: "#", img: "/assets/FifthP.png" },
-        { id: 4, x: 0.3, y: 0.55, width: 0.25, height: 0.7, title: ["Card 4"], hoverText: "Hover text 4", link: "#", img: "/assets/FirstApp.png" },
-        { id: 5, x: 0.6, y: 0.95, width: 0.4, height: 0.3, title: ["Card 5"], hoverText: "Hover text 5", link: "#", img: "/assets/ThirdP.png" },
-        { id: 6, x: 0, y: 1.3, width: 0.3, height: 0.3, title: ["Nothing here", "just a botton to next part", ":P"], hoverText: "Hover text 6", link: "#", img: "/assets/nextButton.png", filter: false },
-        { id: 7, x: 0.35, y: 1.3, width: 0.65, height: 0.3, title: ["Card 7"], hoverText: "Hover text 7", link: "#", img: "/assets/SecondP.png" },
-
-    ]
+    const dispatch = useDispatch()
+    const { currentSection } = useSelector((state: RootState) => state.currentPage)
 
     const requestRef = useRef<number>(0)
     const velocityRef = useRef(0)
@@ -127,9 +109,23 @@ export default function History() {
 
     }, [viewportHeightVW])
 
+    const biggestContainerRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (currentSection == 3) {
+            gsap.to(biggestContainerRef.current, {
+                opacity: 1,
+                delay: 1,
+                duration: 1.5,
+                ease: "power3.Out"
+            })
+        }
+    }, [currentSection])
+
+
     return (
 
-        <div className="w-screen h-screen flex items-center justify-center z-10">
+        <div className="w-screen h-screen flex items-center justify-center z-10 opacity-0 " ref={biggestContainerRef}>
 
             <div className="relative w-full h-[80vh] overflow-hidden flex items-center justify-center">
 
