@@ -5,7 +5,7 @@ type CursorLayer = "red" | "blue" | "green"
 const initialState = {
     layers: {
         red: false,
-        blue: false,
+        blue: true,
         green: false,
     } as Record<CursorLayer, boolean>
 }

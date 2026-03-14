@@ -5,8 +5,8 @@ import gsap from "gsap"
 
 
 
-export const MouseLogo = ({ xJustify }: { xJustify: number }) => {
-
+export const MouseLogo = ({ props }: { props: { xJustify: number, mouseShow: boolean } }) => {
+    const { xJustify, mouseShow } = props
     const mouseRef = useRef<HTMLDivElement>(null)
     const baseRef = useRef<HTMLImageElement>(null)
     const redRef = useRef<HTMLImageElement>(null)
@@ -17,6 +17,12 @@ export const MouseLogo = ({ xJustify }: { xJustify: number }) => {
 
 
     // color layer control
+
+    const tweens = useRef<Record<string, gsap.core.Tween | null>>({
+        red: null,
+        blue: null,
+        green: null
+    })
     useEffect(() => {
 
         if (
@@ -37,48 +43,77 @@ export const MouseLogo = ({ xJustify }: { xJustify: number }) => {
 
             const visible = layers[key as keyof typeof layers]
 
-            gsap.to(el, {
-                autoAlpha: visible ? 1 : 0,
-                duration: 0.5,
-                ease: "power2.out",
-                overwrite: "auto"
-            })
+            if (visible) {
+
+                if (!tweens.current[key]) {
+                    tweens.current[key] = gsap.to(el, {
+                        autoAlpha: 1,
+                        duration: 1,
+                        delay: key === "red" ? 0.2 : key === "blue" ? 0.4 : 0.6,
+                        yoyo: true,
+                        repeat: -1
+                    })
+                }
+
+            } else {
+
+                tweens.current[key]?.kill()
+                tweens.current[key] = null
+
+                gsap.set(el, { autoAlpha: 0 })
+            }
 
         })
 
     }, [layers])
 
     const lastMousePos = useRef({ x: 0, y: 0 })
-    const beingControlledBymoving = useRef(false)
+    // container 偏移变化 → 更新位置
     useEffect(() => {
         if (!mouseRef.current) return
 
-        // 鼠标位置保存在 ref 中
-        const x = lastMousePos.current.x
-        const y = lastMousePos.current.y
-        beingControlledBymoving.current = true
+        const { x, y } = lastMousePos.current
+
         gsap.set(mouseRef.current, {
             x: x - xJustify,
-            y,
-            onComplete: () => {
-                beingControlledBymoving.current = false
-            }
+            y
         })
+
     }, [xJustify])
 
+    // 鼠标移动
     useEffect(() => {
+
         const move = (e: MouseEvent) => {
-            if (beingControlledBymoving.current) return
             lastMousePos.current = { x: e.clientX, y: e.clientY }
+
             if (!mouseRef.current) return
+
             gsap.set(mouseRef.current, {
                 x: e.clientX - xJustify,
-                y: e.clientY
+                y: e.clientY,
+                duration: 0.1,
             })
         }
+
         window.addEventListener("mousemove", move)
+
         return () => window.removeEventListener("mousemove", move)
+
     }, [xJustify])
+
+    // 控制鼠标显示
+    useEffect(() => {
+
+        if (!mouseRef.current) return
+
+        gsap.to(mouseRef.current, {
+            autoAlpha: mouseShow ? 1 : 0,
+            duration: 0.2,
+            ease: "power2.out"
+        })
+
+    }, [mouseShow])
 
     return (
         <div className="fixed w-[5vw] h-[5vw] -translate-x-1/2 -translate-y-1/2 z-[999] pointer-events-none" ref={mouseRef}>

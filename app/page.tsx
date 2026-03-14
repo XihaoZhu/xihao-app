@@ -12,6 +12,7 @@ import { nextSection } from "@/store/pageControl";
 import { move, resize } from "@/store/ballControl";
 import { emit } from "@/tool/BallEvenBus";
 import { MouseLogo } from "./components/mouse";
+import { setCursorLayers } from "@/store/mouseControl";
 
 
 
@@ -81,15 +82,19 @@ export default function Home() {
   // when move section the viewport moves
 
   const [containerX, setContainerX] = useState(0)
+  const [mouseShown, setMouseShown] = useState(true)
   useEffect(() => {
     if (pageCurrentSection == 1) {
       gsap.to(biggestContainerRef.current, {
         x: -windowWidthRef.current,
         duration: 2,
         ease: "power2.inOut",
-        onUpdate: () => {
+        onStart: () => setMouseShown(false),
+        onComplete: () => {
           const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
           setContainerX(x)
+          setMouseShown(true)
+          dispatch(setCursorLayers(["green"]))
         }
       })
     }
@@ -99,9 +104,12 @@ export default function Home() {
         duration: 1,
         ease: "none",
         delay: 3.5,
-        onUpdate: () => {
+        onStart: () => setMouseShown(false),
+        onComplete: () => {
           const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
           setContainerX(x)
+          setMouseShown(true)
+          dispatch(setCursorLayers(["green"]))
         }
       })
     }
@@ -110,9 +118,11 @@ export default function Home() {
         x: -windowWidthRef.current * 3,
         ease: "none",
         duration: 1,
-        onUpdate: () => {
+        onStart: () => setMouseShown(false),
+        onComplete: () => {
           const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
           setContainerX(x)
+          setMouseShown(true)
         }
       })
     }
@@ -121,9 +131,11 @@ export default function Home() {
         x: -windowWidthRef.current * 4,
         ease: "none",
         duration: 1,
-        onUpdate: () => {
+        onStart: () => setMouseShown(false),
+        onComplete: () => {
           const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
           setContainerX(x)
+          setMouseShown(true)
         }
       })
     }
@@ -221,33 +233,41 @@ export default function Home() {
       if (pageCurrentSection == 1) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current,
-          onUpdate: () => {
+          onStart: () => setMouseShown(false),
+          onComplete: () => {
             const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
             setContainerX(x)
+            setMouseShown(true)
           }
         });
       } else if (pageCurrentSection == 2) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current * 2,
-          onUpdate: () => {
+          onStart: () => setMouseShown(false),
+          onComplete: () => {
             const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
             setContainerX(x)
+            setMouseShown(true)
           }
         });
       } else if (pageCurrentSection == 3) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current * 3,
-          onUpdate: () => {
+          onStart: () => setMouseShown(false),
+          onComplete: () => {
             const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
             setContainerX(x)
+            setMouseShown(true)
           }
         });
       } else if (pageCurrentSection == 4) {
         gsap.to(biggestContainerRef.current, {
           x: -windowWidthRef.current * 4,
-          onUpdate: () => {
+          onStart: () => setMouseShown(false),
+          onComplete: () => {
             const x = gsap.getProperty(biggestContainerRef.current, "x") as number || 0
             setContainerX(x)
+            setMouseShown(true)
           }
         });
       }
@@ -323,7 +343,7 @@ export default function Home() {
   }, [x, y, pageCurrentSection, scale]);
 
   return (
-    <div className="bg-black h-screen flex overflow-hidden w-screen relative " >
+    <div className="bg-black h-screen flex overflow-hidden w-screen relative cursor-none" >
       <div
         className="flex h-auto w-auto p-0 relative"
         ref={biggestContainerRef}
@@ -343,7 +363,7 @@ export default function Home() {
         <About />
         <Current />
         <History />
-        <MouseLogo xJustify={containerX} />
+        <MouseLogo props={{ xJustify: containerX, mouseShow: mouseShown }} />
       </div>
     </div>
   );

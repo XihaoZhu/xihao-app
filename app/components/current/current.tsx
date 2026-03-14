@@ -10,6 +10,7 @@ import { RadialLines } from "./RadialLines/RadialLines";
 import { Wheel } from "./Wheel/Wheel";
 import { nextSection } from "@/store/pageControl";
 import { useCallback } from "react";
+import { setCursorLayers } from "@/store/mouseControl";
 
 type CollapseSource = 'text' | 'mouse'
 
@@ -117,6 +118,7 @@ export default function Current() {
                     topRightActivated.current = true
                     svg.style.pointerEvents = 'none'
                     setAboutActive(true)
+                    dispatch(setCursorLayers(["red"]))
                 }
             })
         }
@@ -157,6 +159,7 @@ export default function Current() {
                         (visitedRight.current ? 1 : 0)
                     )
                     topRightActivated.current = false
+                    dispatch(setCursorLayers(["green"]))
 
                 }
             })
@@ -251,6 +254,7 @@ export default function Current() {
                     Bactivated.current = true
                     svg.style.pointerEvents = 'none'
                     setFrontendActive(true)
+                    dispatch(setCursorLayers(["red"]))
                 }
             })
         }
@@ -293,6 +297,7 @@ export default function Current() {
                         (visitedRight.current ? 1 : 0)
                     )
                     Bactivated.current = false
+                    dispatch(setCursorLayers(["green"]))
                 }
             })
         }
@@ -337,6 +342,7 @@ export default function Current() {
             tl.to(el, {
                 fill: "#58ff77",
             })
+            dispatch(setCursorLayers(["red", "green"]))
             let isReturningToStart = false
             const tween = gsap.to(el, {
                 transformOrigin: '50% 50%',
