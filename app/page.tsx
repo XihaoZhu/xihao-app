@@ -5,7 +5,7 @@ import About from "./components/about/About";
 import Intro from "./components/intro/intro";
 import Current from "./components/current/current";
 import History from "./components/history/History";
-import Contact from "./components/contact/contact";
+import Contact from "./components/contact/Contact";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { gsap } from "gsap";

@@ -133,17 +133,13 @@ export default function Contact() {
                 )
 
                 try {
+                    if (!navigator.clipboard) throw new Error("Clipboard not supported")
 
                     await navigator.clipboard.writeText(email)
-                    setTimeout(() => {
-                        alert(`My Email copied to clipboard already.
-                        Email me!`)
-                    }, 500)
-
-                } catch {
-
-                    alert("Copy failed")
-
+                    alert("Email copied to clipboard! Email me!")
+                } catch (err) {
+                    console.error(err)
+                    alert("Copy failed, web desn't feel safe for me to command your clip board. Anyway you know my email :P")
                 }
 
             })

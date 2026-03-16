@@ -366,10 +366,12 @@ export default function Current() {
 
             tl.add(tween, '<');
         }
+        let animating = false
 
         const moveToHistory = () => {
-            if (visitedCount < 2) return
+            if (visitedCount < 2 || animating) return
 
+            animating = true
             setShouldStopRef(true)
             gsap.killTweensOf([rightTop.current, bottom.current])
             tl.to([rightTop.current, bottom.current], {
@@ -387,6 +389,7 @@ export default function Current() {
                     duration: 1,
                     onComplete: () => {
                         dispatch(nextSection())
+                        animating = false
                     },
 
                 })
