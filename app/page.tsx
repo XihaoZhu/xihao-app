@@ -2,8 +2,8 @@
 
 import { use, useEffect, useRef, useState } from "react";
 import About from "./components/about/About";
-import Intro from "./components/intro/Intro";
-import Current from "./components/current/Current";
+import Intro from "./components/intro/Intro_temp";
+import Current from "./components/current/Current_temp";
 import History from "./components/history/History";
 import Contact from "./components/contact/Contact";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,7 +12,7 @@ import { gsap } from "gsap";
 import { nextSection } from "@/store/pageControl";
 import { move, resize } from "@/store/ballControl";
 import { emit } from "@/tool/BallEvenBus";
-import { MouseLogo } from "./components/Mouse";
+import { MouseLogo } from "./components/Mouse_temp";
 import { setCursorLayers } from "@/store/mouseControl";
 import { Layers } from "three";
 
