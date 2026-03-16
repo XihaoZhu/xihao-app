@@ -43,7 +43,7 @@ export const cards: CardData[] = [
         width: 0.25,
         height: 0.7,
         title: ["Python", "Django", "PostgreSQL", "HTML", "Tailwind", "TypeScript", "React", "..."],
-        hoverText: ["2025", "A full stack canlendar web built for am interview",],
+        hoverText: ["2025", "A full stack canlendar web built for an interview",],
         link: "https://www.loom.com/share/000d06b369634d60a314d50ba2a9f352?sid=2a2bc59f-8a08-4e71-963f-e03455a12bf3",
         img: "/assets/FifthP.png"
     },

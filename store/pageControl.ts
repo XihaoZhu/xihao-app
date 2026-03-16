@@ -4,7 +4,7 @@ import next from 'next';
 const pageControlSlice = createSlice({
     name: 'pageControl',
     initialState: {
-        currentSection: 3,
+        currentSection: 0,
     },
     reducers: {
         nextSection(state) {
