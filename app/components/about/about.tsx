@@ -198,7 +198,7 @@ export default function About() {
         "Then I worked full-time at another restaurant.",
         "I also taught A-level physics in an extracurricular class for 6 months as a part time job.",
         "I became the supervisor at the restaurant.",
-        "I saved some money and quit to focus on coding.",
+        "I saved some money and quit my job, to take a break and work more on coding.",
         "I began self-learning coding back to the end of 2023, and although the time and effort I could dedicate varied across different periods, I have never stopped moving forward in this direction."
     ];
     const intervals: number[][] = [

@@ -5,6 +5,7 @@ import About from "./components/about/About";
 import Intro from "./components/intro/intro";
 import Current from "./components/current/current";
 import History from "./components/history/History";
+import Contact from "./components/contact/Contact";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { gsap } from "gsap";
@@ -129,6 +130,7 @@ export default function Home() {
     else if (pageCurrentSection == 4) {
       gsap.to(biggestContainerRef.current, {
         x: -windowWidthRef.current * 4,
+        delay: 0.5,
         ease: "none",
         duration: 1,
         onStart: () => setMouseShown(false),
@@ -212,9 +214,31 @@ export default function Home() {
         onComplete: () => {
           dispatch(
             move({
-              y: 1,
-              x: 4,
-            }), resize({ scale: 5 })
+              y: 0.5,
+              x: 3.5,
+            }), resize({ scale: 20 })
+          )
+        },
+      })
+    }
+  }, [pageCurrentSection]);
+
+  // when move to contact section the ball moves
+  useEffect(() => {
+    if (pageCurrentSection === 4) {
+      gsap.to(ballRef.current, {
+        delay: 0.5,
+        y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
+        x: 4.5 * windowWidthRef.current - 0.025 * windowWidthRef.current,
+        scale: 30,
+        ease: 'none',
+        duration: 1,
+        onComplete: () => {
+          dispatch(
+            move({
+              y: 0.5,
+              x: 4.5,
+            }), resize({ scale: 30 })
           )
         },
       })
@@ -363,6 +387,7 @@ export default function Home() {
         <About />
         <Current />
         <History />
+        <Contact />
         <MouseLogo props={{ xJustify: containerX, mouseShow: mouseShown }} />
       </div>
     </div>

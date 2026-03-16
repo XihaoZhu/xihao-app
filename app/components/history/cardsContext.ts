@@ -79,10 +79,10 @@ export const cards: CardData[] = [
         width: 0.3,
         height: 0.3,
         title: ["Nothing here",
-            "just a botton to next part",
+            "just a botton to the last page",
             ":P"],
         hoverText: ["Ready?", "Click then"],
-        link: "#",
+        link: "",
         img: "/assets/nextButton.png",
         filter: false
     },

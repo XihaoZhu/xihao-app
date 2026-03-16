@@ -122,6 +122,16 @@ export default function History() {
         }
     }, [currentSection])
 
+    // fading out ani
+    useEffect(() => {
+        if (currentSection == 4) {
+            gsap.to(biggestContainerRef.current, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power3.Out"
+            })
+        }
+    }, [currentSection])
 
     return (
 

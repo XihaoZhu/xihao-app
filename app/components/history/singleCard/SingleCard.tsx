@@ -1,5 +1,8 @@
 
-import React from "react"
+import next from "next"
+import React, { use } from "react"
+import { useDispatch } from "react-redux"
+import { nextSection } from "@/store/pageControl"
 
 type CardProps = {
     img?: string
@@ -28,11 +31,17 @@ export default function SingleCard({
     bottomGlowY,
     filter = true,
 }: CardProps) {
+
+    const dispatch = useDispatch()
     return (
-        <a
-            href={link}
+        <div
+            onClick={() => {
+                if (link) {window.open(link, "_blank")}else{
+                    dispatch(nextSection())
+                };
+            }}
             className="group absolute block overflow-hidden rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300"
-            target="_blank" rel="noopener noreferrer"
+            rel="noopener noreferrer"
             style={{ width, height, left: x, top: y }}
         >
             {/* Image */}
@@ -101,6 +110,6 @@ export default function SingleCard({
                     }}
                 />
             )}
-        </a>
+        </div>
     )
 }
