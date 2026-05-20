@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState, useLayoutEffect } from "react";
 import About from "./components/about/About";
 import Intro from "./components/intro/Intro_temp";
 import Current from "./components/current/Current_temp";
@@ -85,7 +85,7 @@ export default function Home() {
 
   const [containerX, setContainerX] = useState(0)
   const [mouseShown, setMouseShown] = useState(true)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection == 1) {
       gsap.to(biggestContainerRef.current, {
         x: -windowWidthRef.current,
@@ -145,7 +145,7 @@ export default function Home() {
   }, [pageCurrentSection]);
 
   // when move to about section the ball moves
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection === 1) {
       const tl = gsap.timeline()
       tl.to(ballRef.current, { x: ballLocationRef.current.x * windowWidthRef.current, duration: 3, ease: 'power2.out' })
@@ -172,7 +172,7 @@ export default function Home() {
   }, [pageCurrentSection]);
 
   // when move to current section the ball moves
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection === 2) {
       const tl = gsap.timeline()
       tl.to(ballRef.current, { y: windowHeightRef.current - 0.05 * windowWidthRef.current, duration: 1, ease: 'power2.out', transformOrigin: '50% 50%', delay: 0.5 })
@@ -204,7 +204,7 @@ export default function Home() {
   }, [pageCurrentSection]);
 
   // when move to history section the ball moves
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection === 3) {
       gsap.to(ballRef.current, {
         y: 0.5 * windowHeightRef.current - 0.025 * windowWidthRef.current,
@@ -225,7 +225,7 @@ export default function Home() {
   }, [pageCurrentSection]);
 
   // when move to contact section the ball moves
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection === 4) {
       gsap.to(ballRef.current, {
         delay: 0.5,
@@ -251,7 +251,7 @@ export default function Home() {
   }, [pageCurrentSection]);
 
   // handle resizing of window
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleResize = () => {
       windowHeightRef.current = window.innerHeight;
       windowWidthRef.current = window.innerWidth;
@@ -320,7 +320,7 @@ export default function Home() {
 
   //Move the ball on scroll in intro page only
   const listenersReady = useRef(false);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!ballRef.current) return;
     if (pageCurrentSection != 0) return;
 
@@ -356,7 +356,7 @@ export default function Home() {
   }, []);
 
   // ballMove in about page
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection !== 1) return;
     if (!hasMovedtoAbout.current) return
     handleBallMove(0.1);
@@ -364,7 +364,7 @@ export default function Home() {
 
   // ball control in current page
   const waitCurAni = useRef(true)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageCurrentSection !== 2) return;
     if (waitCurAni.current) return
     handleBallMove()
